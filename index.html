@@ -222,19 +222,29 @@
         // 6. โหลดข้อมูลลงหน้าเว็บ
         async function loadData() {
             try {
-                // โหลดภาพรวม
+                // 1. โหลดข้อมูลภาพรวม (สรุปตรวจรับงาน)
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
-                    const approved = parseFloat(overviewData[0]['มูลค่า']) || 0;
-                    const remBudget = parseFloat(overviewData[1]['มูลค่า']) || 0;
+                    
+                    // 📌 ส่วนที่แก้ไข: ดึงชื่อคอลัมน์แรก (Index 0) มาใช้อัตโนมัติ ป้องกันปัญหาอักขระซ่อนเร้น
+                    const valColumn = Object.keys(overviewData[0])[0]; 
+                    
+                    const approved = parseFloat(overviewData[0][valColumn]) || 0;
+                    const remBudget = parseFloat(overviewData[1][valColumn]) || 0;
                     const totalBudget = approved + remBudget;
                     
                     const timeElapsed = parseFloat(overviewData[0]['เวลาคงเหลือ']) || 0;
                     const timeRem = parseFloat(overviewData[1]['เวลาคงเหลือ']) || 0;
                     const totalTime = timeElapsed + timeRem;
 
-                    document.getElementById('card-total-budget').innerText = (totalBudget/1000000).toFixed(2) + ' ลบ.';
-                    document.getElementById('card-approved').innerText = (approved/1000000).toFixed(2) + ' ลบ.';
+                    // 📌 อัปเดตการ์ด: ถ้าอยากให้แสดงตัวเลขเต็มๆ 984,784,000 บาท ให้ใช้โค้ดด้านล่างนี้ครับ
+                    document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
+                    document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
+                    
+                    // (แต่ถ้าอยากได้แบบ 984.78 ลบ. เหมือนเดิม ให้ใช้บรรทัดล่างนี้แทนครับ)
+                    // document.getElementById('card-total-budget').innerText = (totalBudget/1000000).toFixed(2) + ' ลบ.';
+                    // document.getElementById('card-approved').innerText = (approved/1000000).toFixed(2) + ' ลบ.';
+
                     document.getElementById('card-total-time').innerText = totalTime + ' วัน';
                     document.getElementById('card-remaining-time').innerText = timeRem + ' วัน';
 
@@ -336,4 +346,5 @@
     </script>
 </body>
 </html>
+
 
