@@ -46,14 +46,11 @@
     <div class="bg-indigo-900 pt-8 pb-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-white text-lg font-medium mb-4 opacity-90">ภาพรวมความคืบหน้า</h2>
-            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-indigo-500 relative overflow-hidden">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-sack-dollar text-indigo-500 mr-2"></i>งบประมาณทั้งสิ้น</p>
                     <h3 class="text-2xl font-bold text-slate-800 mt-2" id="card-total-budget">กำลังโหลด...</h3>
                 </div>
-                
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-emerald-500 relative overflow-hidden flex flex-col justify-between">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-money-bill-trend-up text-emerald-500 mr-2"></i>เบิกจ่ายสะสม</p>
                     <div class="flex items-end justify-between mt-2">
@@ -61,7 +58,6 @@
                         <span id="pct-approved" class="text-sm font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md mb-1">-%</span>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-slate-400 relative overflow-hidden flex flex-col justify-between">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-wallet text-slate-400 mr-2"></i>งบประมาณคงเหลือ</p>
                     <div class="flex items-end justify-between mt-2">
@@ -69,12 +65,10 @@
                         <span id="pct-rem-budget" class="text-sm font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-md mb-1">-%</span>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-amber-500 relative overflow-hidden mt-2 md:mt-0">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-regular fa-calendar-days text-amber-500 mr-2"></i>ระยะเวลาโครงการ</p>
                     <h3 class="text-2xl font-bold text-slate-800 mt-2" id="card-total-time">กำลังโหลด...</h3>
                 </div>
-
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-blue-500 relative overflow-hidden mt-2 md:mt-0 flex flex-col justify-between">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-person-digging text-blue-500 mr-2"></i>ระยะเวลาดำเนินงาน</p>
                     <div class="flex items-end justify-between mt-2">
@@ -82,7 +76,6 @@
                         <span id="pct-elapsed-time" class="text-sm font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md mb-1">-%</span>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-rose-500 relative overflow-hidden mt-2 md:mt-0 flex flex-col justify-between">
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-hourglass-half text-rose-500 mr-2"></i>ระยะเวลาคงเหลือ</p>
                     <div class="flex items-end justify-between mt-2">
@@ -90,7 +83,6 @@
                         <span id="pct-rem-time" class="text-sm font-bold bg-rose-100 text-rose-700 px-2 py-1 rounded-md mb-1">-%</span>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -134,20 +126,21 @@
         <div id="tab-installments" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> รายละเอียดสถานะงวดงาน</h3>
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> สรุปความคืบหน้ารายงาน</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-white border-b border-slate-200">
-                                <th class="p-4 text-sm font-semibold text-slate-500">ชื่องาน (รายการ)</th>
-                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">งวดที่</th>
-                                <th class="p-4 text-sm font-semibold text-slate-500 text-right">จำนวนเงิน (บาท)</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500">ชื่องาน</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">ต้องตรวจรับ<br><span class="text-xs font-normal">(งวด)</span></th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">ตรวจรับแล้ว<br><span class="text-xs font-normal">(งวด)</span></th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-right">จำนวนเงินที่เบิก<br><span class="text-xs font-normal">(บาท)</span></th>
                                 <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody id="installments-body" class="divide-y divide-slate-100">
-                            <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังประมวลผลข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -183,7 +176,6 @@
     </main>
 
     <script>
-        // ลิงก์ข้อมูล
         const URLS = {
             overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
             installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
@@ -245,95 +237,116 @@
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
                     const valColumn = Object.keys(overviewData[0])[0]; 
-                    
                     const approved = safeParseFloat(overviewData[0][valColumn]);
                     const remBudget = safeParseFloat(overviewData[1][valColumn]);
                     const totalBudget = approved + remBudget;
-                    
                     const timeElapsed = safeParseFloat(overviewData[0]['เวลาคงเหลือ']);
                     const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
                     const totalTime = timeElapsed + timeRem;
 
-                    // คำนวณเปอร์เซ็นต์
                     const pctApproved = totalBudget > 0 ? ((approved / totalBudget) * 100).toFixed(2) : 0;
                     const pctRemBudget = totalBudget > 0 ? ((remBudget / totalBudget) * 100).toFixed(2) : 0;
                     const pctElapsed = totalTime > 0 ? ((timeElapsed / totalTime) * 100).toFixed(2) : 0;
                     const pctRemTime = totalTime > 0 ? ((timeRem / totalTime) * 100).toFixed(2) : 0;
 
-                    // ใส่ข้อมูลลงในหน้าเว็บ (ตัวเลข + %)
                     document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
-                    
                     document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
                     document.getElementById('pct-approved').innerText = pctApproved + '%';
-                    
                     document.getElementById('card-rem-budget').innerText = remBudget.toLocaleString() + ' บาท';
                     document.getElementById('pct-rem-budget').innerText = pctRemBudget + '%';
-
                     document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
-                    
                     document.getElementById('card-elapsed-time').innerText = timeElapsed.toLocaleString() + ' วัน';
                     document.getElementById('pct-elapsed-time').innerText = pctElapsed + '%';
-                    
                     document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
                     document.getElementById('pct-rem-time').innerText = pctRemTime + '%';
 
-                    // วาดกราฟงบประมาณ
                     new Chart(document.getElementById('budgetChart').getContext('2d'), {
                         type: 'doughnut',
                         data: {
                             labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'],
                             datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
                         },
-                        options: { 
-                            cutout: '75%', 
-                            plugins: { 
-                                legend: { position: 'bottom' },
-                                tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' บาท'; } } }
-                            } 
-                        }
+                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' บาท'; } } } } }
                     });
 
-                    // วาดกราฟเวลา
                     new Chart(document.getElementById('timeChart').getContext('2d'), {
                         type: 'doughnut',
                         data: {
                             labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'],
                             datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
                         },
-                        options: { 
-                            cutout: '75%', 
-                            plugins: { 
-                                legend: { position: 'bottom' },
-                                tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' วัน'; } } }
-                            } 
-                        }
+                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' วัน'; } } } } }
                     });
                 }
 
-                // โหลดงานงวดเงิน
+                // 📌 2. โหลดงานงวดเงิน (จัดกลุ่มแบบ Pivot Table)
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
-                    let html = '';
+                    const grouped = {};
+                    let grandTotalInst = 0;
+                    let grandCompInst = 0;
+                    let grandCompMoney = 0;
+
+                    // วนลูปเพื่อจัดกลุ่มข้อมูลตาม "ชื่องาน"
                     instData.forEach(row => {
-                        if(!row['ชื่องาน']) return;
-                        const amt = safeParseFloat(row['เงิน']);
-                        const isDone = row['สถานะการตรวจรับ'] === 'True';
-                        const badge = isDone 
-                            ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check mr-1"></i> ตรวจรับแล้ว</span>` 
-                            : `<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium"><i class="fa-solid fa-hourglass-half mr-1"></i> รอดำเนินการ</span>`;
-                        
-                        html += `
-                        <tr class="hover:bg-slate-50 border-b border-slate-50">
-                            <td class="p-4 text-slate-700 font-medium">${row['ชื่องาน']}</td>
-                            <td class="p-4 text-center text-slate-500">${row['งวดที่']}</td>
-                            <td class="p-4 text-right font-medium text-slate-800">${amt.toLocaleString()}</td>
-                            <td class="p-4 text-center">${badge}</td>
-                        </tr>`;
+                        const jobName = row['ชื่องาน'];
+                        if(!jobName || jobName.trim() === '') return;
+
+                        if(!grouped[jobName]) {
+                            grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0 };
+                        }
+
+                        grouped[jobName].totalInst += 1;
+                        grandTotalInst += 1;
+
+                        if(row['สถานะการตรวจรับ'] === 'True') {
+                            grouped[jobName].compInst += 1;
+                            grandCompInst += 1;
+                            
+                            const money = safeParseFloat(row['เงิน']);
+                            grouped[jobName].compMoney += money;
+                            grandCompMoney += money;
+                        }
                     });
+
+                    // วาดตารางจากข้อมูลที่จัดกลุ่มแล้ว
+                    let html = '';
+                    for (const [jobName, data] of Object.entries(grouped)) {
+                        const pct = data.totalInst > 0 ? Math.round((data.compInst / data.totalInst) * 100) : 0;
+                        const isDone = data.compInst === data.totalInst && data.totalInst > 0;
+                        
+                        // เช็คสถานะ (สีเขียวเสร็จสมบูรณ์ / สีเหลืองกำลังดำเนินการ)
+                        const statusText = isDone ? 'เสร็จสมบูรณ์' : 'กำลังดำเนินการ';
+                        const statusColor = isDone ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100';
+
+                        html += `
+                        <tr class="hover:bg-slate-50 border-b border-slate-50 transition-colors">
+                            <td class="p-4 text-slate-700 font-medium">${jobName}</td>
+                            <td class="p-4 text-center text-slate-500">${data.totalInst}</td>
+                            <td class="p-4 text-center text-slate-800 font-semibold">${data.compInst} <span class="text-xs text-slate-400 font-normal ml-1">(${pct}%)</span></td>
+                            <td class="p-4 text-right font-medium text-slate-800">${data.compMoney.toLocaleString()}</td>
+                            <td class="p-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span>
+                            </td>
+                        </tr>`;
+                    }
+
+                    // สร้างบรรทัดสรุปผลรวม (Grand Total) ล่างสุด
+                    const grandPct = grandTotalInst > 0 ? Math.round((grandCompInst / grandTotalInst) * 100) : 0;
+                    html += `
+                        <tr class="bg-indigo-50 border-t-2 border-indigo-200">
+                            <td class="p-4 text-indigo-900 font-bold text-right">รวมทั้งหมด</td>
+                            <td class="p-4 text-center text-indigo-900 font-bold">${grandTotalInst}</td>
+                            <td class="p-4 text-center text-indigo-900 font-bold">${grandCompInst} <span class="text-xs text-indigo-500 font-normal ml-1">(${grandPct}%)</span></td>
+                            <td class="p-4 text-right text-indigo-900 font-bold">${grandCompMoney.toLocaleString()} บาท</td>
+                            <td class="p-4 text-center font-bold text-indigo-900">-</td>
+                        </tr>
+                    `;
+
                     document.getElementById('installments-body').innerHTML = html;
                 }
 
-                // โหลดขออนุมัติ
+                // 3. โหลดขออนุมัติ
                 const appData = await fetchCSV(URLS.approvals);
                 if(appData.length > 0) {
                     let html = '';
@@ -356,7 +369,7 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // โหลดเอกสารสัญญา
+                // 4. โหลดเอกสารสัญญา
                 const docsData = await fetchCSV(URLS.docs);
                 if(docsData.length > 0) {
                     let html = '';
