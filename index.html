@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบติดตามความคืบหน้าโครงการก่อสร้าง</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <nav class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4 font-bold text-xl">
+                    🏢 Dashboard ติดตามงาน
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="switchTab('tab-overview')" id="btn-overview" class="tab-btn px-4 py-2 rounded-md bg-indigo-700 font-medium transition-colors">ภาพรวมงบประมาณ</button>
+                    <button onclick="switchTab('tab-installments')" id="btn-installments" class="tab-btn px-4 py-2 rounded-md hover:bg-indigo-800 font-medium transition-colors">สถานะงานงวดเงิน</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 mt-4">
+
+        <div id="tab-overview" class="tab-content block">
+            <h2 class="text-2xl font-bold mb-6 text-slate-700 border-b pb-2">ภาพรวมงบประมาณและเวลา</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                        <h3 class="text-slate-500 font-semibold mb-1">เงินที่ตรวจรับแล้ว (ดำเนินการมาแล้ว)</h3>
+                        <p class="text-3xl font-bold text-slate-800" id="val-approved">กำลังโหลด...</p>
+                        <p class="text-sm text-slate-400 mt-2">เวลาที่ใช้ไป: <span id="time-elapsed" class="font-bold text-slate-600">-</span> วัน</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                        <h3 class="text-slate-500 font-semibold mb-1">งบประมาณคงเหลือ</h3>
+                        <p class="text-3xl font-bold text-slate-800" id="val-remaining">กำลังโหลด...</p>
+                        <p class="text-sm text-slate-400 mt-2">เวลาคงเหลือ: <span id="time-remaining" class="font-bold text-slate-600">-</span> วัน</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center justify-center">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4 w-full text-center">สัดส่วนงบประมาณโครงการ</h3>
+                    <div class="w-full max-w-[300px]">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-installments" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-slate-700 border-b pb-2">รายละเอียดสถานะงานงวดเงิน</h2>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-200">
+                                <th class="p-4 text-slate-600 font-semibold">ชื่องาน (รายการ)</th>
+                                <th class="p-4 text-slate-600 font-semibold text-center w-24">งวดที่</th>
+                                <th class="p-4 text-slate-600 font-semibold text-right">จำนวนเงิน (บาท)</th>
+                                <th class="p-4 text-slate-600 font-semibold text-center">สถานะ</th>
+                                <th class="p-4 text-slate-600 font-semibold text-center">วันที่ตรวจรับ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="installments-table-body" class="divide-y divide-slate-100">
+                            <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ==============================================================
+        // 🚨 1. นำลิงก์ CSV ของ Google Sheets มาใส่ในเครื่องหมายคำพูดด้านล่างนี้ 
+        // ==============================================================
+        const URLS = {
+            overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
+            installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv'
+        };
+
+        // ==============================================================
+        // 2. ระบบสลับหน้าจอ (Tab Navigation)
+        // ==============================================================
+        function switchTab(tabId) {
+            // ซ่อนเนื้อหาทุกแท็บ
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // แสดงแท็บที่ถูกคลิก
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // รีเซ็ตสีปุ่มทั้งหมด แล้วไฮไลท์ปุ่มที่ถูกคลิก
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-indigo-700'));
+            
+            if(tabId === 'tab-overview') document.getElementById('btn-overview').classList.add('bg-indigo-700');
+            if(tabId === 'tab-installments') document.getElementById('btn-installments').classList.add('bg-indigo-700');
+        }
+
+        // ==============================================================
+        // 3. ฟังก์ชันช่วยดึงข้อมูล (แปลงจาก CSV ให้เป็นตัวแปรอ่านง่ายๆ)
+        // ==============================================================
+        function fetchCSV(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, { 
+                    download: true, 
+                    header: true, // บอกให้มันอ่านบรรทัดแรกเป็นชื่อคอลัมน์
+                    complete: function(results) { resolve(results.data); }, 
+                    error: function(err) { reject(err); }
+                });
+            });
+        }
+
+        // ==============================================================
+        // 4. ฟังก์ชันหลักสำหรับโหลดและวาดข้อมูลลงหน้าเว็บ
+        // ==============================================================
+        async function buildDashboard() {
+            try {
+                // ------------------------------------------------------
+                // โหลดแท็บ 1: ภาพรวมงบประมาณ
+                // ------------------------------------------------------
+                const overviewData = await fetchCSV(URLS.overview);
+                
+                // ตรวจสอบว่ามีข้อมูลอย่างน้อย 2 แถว (ตรวจรับแล้ว กับ คงเหลือ)
+                if(overviewData.length >= 2) {
+                    const approvedValue = parseFloat(overviewData[0]['มูลค่า']) || 0;
+                    const remainingValue = parseFloat(overviewData[1]['มูลค่า']) || 0;
+                    
+                    const timeElapsed = overviewData[0]['เวลาคงเหลือ'] || '-';
+                    const timeRemaining = overviewData[1]['เวลาคงเหลือ'] || '-';
+
+                    // ยัดตัวเลขใส่หน้า HTML พร้อมใส่ลูกน้ำ
+                    document.getElementById('val-approved').innerText = approvedValue.toLocaleString() + ' ฿';
+                    document.getElementById('val-remaining').innerText = remainingValue.toLocaleString() + ' ฿';
+                    document.getElementById('time-elapsed').innerText = timeElapsed;
+                    document.getElementById('time-remaining').innerText = timeRemaining;
+                    
+                    // สร้างกราฟโดนัท
+                    const ctx = document.getElementById('budgetChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['ตรวจรับแล้ว', 'งบประมาณคงเหลือ'],
+                            datasets: [{
+                                data: [approvedValue, remainingValue],
+                                backgroundColor: ['#10b981', '#cbd5e1'], // สีเขียวมรกต กับ สีเทา
+                                borderWidth: 0,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                }
+
+                // ------------------------------------------------------
+                // โหลดแท็บ 2: สถานะงานงวดเงิน
+                // ------------------------------------------------------
+                const installData = await fetchCSV(URLS.installments);
+                let tableHTML = '';
+                
+                // วนลูปสร้างตารางทีละบรรทัด
+                installData.forEach(row => {
+                    // ถ้าช่อง 'ชื่องาน' ว่างเปล่า ให้ข้ามบรรทัดนั้นไปเลย
+                    if(!row['ชื่องาน'] || row['ชื่องาน'].trim() === '') return; 
+                    
+                    const amount = parseFloat(row['เงิน']) || 0;
+                    const dateStr = row['วันที่ตรวจรับ'] || '-';
+                    
+                    // ทำป้ายสถานะ (Badge) ให้สวยงาม 
+                    // เช็คคำว่า 'True' จาก Excel (ถ้าตรวจรับแล้วจะเป็น True)
+                    let statusBadge = '';
+                    if(row['สถานะการตรวจรับ'] && row['สถานะการตรวจรับ'].trim() === 'True') {
+                        statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">✅ ตรวจรับแล้ว</span>';
+                    } else {
+                        statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">⏳ รอดำเนินการ</span>';
+                    }
+
+                    // ประกอบร่าง HTML ตาราง
+                    tableHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                        <td class="p-4 text-slate-700">${row['ชื่องาน']}</td>
+                        <td class="p-4 text-center font-medium text-slate-500">${row['งวดที่']}</td>
+                        <td class="p-4 text-right font-medium text-slate-700">${amount.toLocaleString()}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-center text-sm text-slate-500">${dateStr}</td>
+                    </tr>`;
+                });
+                
+                // เอา HTML ที่ประกอบเสร็จแล้ว ไปยัดใส่ในตาราง
+                document.getElementById('installments-table-body').innerHTML = tableHTML;
+
+            } catch (error) {
+                console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+                document.getElementById('installments-table-body').innerHTML = `
+                    <tr><td colspan="5" class="p-8 text-center text-red-500 font-bold">
+                        ❌ ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบลิงก์ CSV จาก Google Sheets ว่าถูกต้องและเปิดเป็นสาธารณะแล้วหรือไม่
+                    </td></tr>
+                `;
+            }
+        }
+
+        // เริ่มการทำงานทันทีเมื่อเปิดหน้าเว็บ
+        buildDashboard();
+    </script>
+</body>
+</html>
