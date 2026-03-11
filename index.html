@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แดชบอร์ดโครงการ V4 (พร้อมแผนผัง)</title>
+    <title>แดชบอร์ดโครงการก่อสร้าง</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,6 @@
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .smooth-transition { transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        /* เอฟเฟกต์จุดกระพริบสำหรับงานที่กำลังทำ */
         .ping-indicator { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
     </style>
 </head>
@@ -25,9 +24,16 @@
     <header class="glass-header sticky top-0 z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4 w-full">
-                <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-indigo-500 shadow-sm shrink-0">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3039/3039394.png" alt="Logo" class="w-10 h-10 object-contain">
+                
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-indigo-500 shadow-sm">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3039/3039394.png" alt="Logo 1" class="w-10 h-10 object-contain">
+                    </div>
+                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-amber-500 shadow-sm">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3039/3039394.png" alt="Logo 2" class="w-10 h-10 object-contain">
+                    </div>
                 </div>
+
                 <div class="flex-1">
                     <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">โครงการก่อสร้างศูนย์ฝึกอบรมกองบัญชาการตำรวจสอบสวนกลาง ระยะที่ 4</h1>
                     <p class="text-sm font-medium text-slate-500 mt-1"><i class="fa-solid fa-building-shield mr-1"></i> ผู้บริหารสัญญา: สำนักงานส่งกำลังบำรุง</p>
@@ -111,15 +117,12 @@
             
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
                 <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
-                    <i class="fa-solid fa-map-location-dot text-emerald-500 mr-2"></i> แผนผังความคืบหน้าก่อสร้าง (Interactive Map)
+                    <i class="fa-solid fa-map-location-dot text-emerald-500 mr-2"></i> แผนผังความคืบหน้าก่อสร้าง
                 </h3>
                 <div class="relative w-full max-w-5xl mx-auto border-4 border-slate-200 rounded-xl bg-slate-50 overflow-hidden" id="map-container">
-                    
-                    <img src="map.jpg" alt="กรุณานำรูปภาพแผนผังมาใส่ในโฟลเดอร์และตั้งชื่อว่า map.jpg" class="w-full h-auto object-contain opacity-90" onerror="this.src='https://placehold.co/1200x800/e2e8f0/475569?text=Please+upload+map.jpg';">
-                    
+                    <img src="map.jpg" alt="แผนผังโครงการ" class="w-full h-auto object-contain opacity-90" onerror="this.src='https://placehold.co/1200x800/e2e8f0/475569?text=Please+upload+map.jpg';">
                     <div id="map-badges"></div>
                 </div>
-                <p class="text-xs text-center text-slate-400 mt-2">*เปอร์เซ็นต์ความคืบหน้าถูกดึงอัตโนมัติจากคอลัมน์ "ความก้าวหน้า %" ในชีทงานงวดเงิน</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -243,21 +246,17 @@
             return parseFloat(cleanString) || 0;
         }
 
-        // ฟังก์ชันอัจฉริยะสำหรับแปลง % (แก้ปัญหาพิมพ์ 0.15 หรือ 15%)
         function parseProgressPercentage(val) {
             if (!val) return 0;
             let str = val.toString().trim();
             let num = parseFloat(str.replace(/,/g, '').replace(/%/g, ''));
             if(isNaN(num)) return 0;
-            // ถ้าพิมพ์เปอร์เซ็นต์มาตรงๆ (เช่น 15%)
             if(str.includes('%')) return num; 
-            // ถ้าพิมพ์เป็นทศนิยม (เช่น 0.15) แปลงให้เป็น 15
             if(num <= 1 && num > 0) return num * 100;
-            return num; // กรณีพิมพ์เลข 15 มาเฉยๆ
+            return num; 
         }
 
-        // 📌 พิกัดของอาคารต่างๆ บนภาพแผนผัง (Top, Left)
-        // ** คุณสามารถแก้ตัวเลข % ตรงนี้เพื่อขยับหมุดให้ตรงกับภาพจริงได้เลย **
+        // 📌 พิกัดของอาคารต่างๆ บนภาพแผนผัง
         const MAP_COORDINATES = {
             "1": { top: '50%', left: '70%', name: 'ผังบริเวณ' },
             "2": { top: '80%', left: '30%', name: 'ส่วนประกอบอื่นๆ' },
@@ -303,30 +302,27 @@
                     new Chart(document.getElementById('timeChart').getContext('2d'), { type: 'doughnut', data: { labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'], datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } } });
                 }
 
-                // โหลดงานงวดเงิน (วาดตาราง + กราฟแท่ง + แผนผังภาพ)
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
                     const grouped = {};
                     let grandTotalInst = 0, grandCompInst = 0, grandCompMoney = 0;
-                    const buildingProgress = {}; // ตัวแปรเก็บ % สำหรับวาดลงแผนผัง
+                    const buildingProgress = {};
 
                     instData.forEach(row => {
                         const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
                         const groupName = row['ชื่องาน (group)'] ? row['ชื่องาน (group)'].trim() : '';
                         
-                        // 1. เก็บความคืบหน้า (%) แยกตามหมวดอาคาร สำหรับวาดแผนผัง
                         if (groupName && row['ความก้าวหน้า %']) {
-                            const match = groupName.match(/งาน\s*(\d+)/); // ดึงเลข 1-15 ออกมาจากชื่อ
+                            const match = groupName.match(/งาน\s*(\d+)/);
                             if (match) {
                                 const buildId = match[1];
                                 const progPct = parseProgressPercentage(row['ความก้าวหน้า %']);
                                 if (!buildingProgress[buildId] || progPct > buildingProgress[buildId]) {
-                                    buildingProgress[buildId] = progPct; // ดึงค่า % ที่มากที่สุดของอาคารนั้นมาใช้
+                                    buildingProgress[buildId] = progPct;
                                 }
                             }
                         }
 
-                        // 2. จัดกลุ่มทำตาราง
                         if(!jobName) return;
                         if(!grouped[jobName]) grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0, totalMoney: 0 };
                         
@@ -344,20 +340,17 @@
                         }
                     });
 
-                    // 📌 ส่วนวาดป้ายคะแนนลงบนภาพแผนผัง (Map Overlay)
+                    // วาดป้ายบนแผนผัง
                     let mapHtml = '';
                     for (const [id, coords] of Object.entries(MAP_COORDINATES)) {
                         const prog = buildingProgress[id] !== undefined ? buildingProgress[id].toFixed(0) : 0;
-                        
-                        // กำหนดสีป้ายตาม % ความคืบหน้า
-                        let bgColor = 'bg-slate-50 text-slate-500 border-slate-300 opacity-90'; // งานยังไม่เดิน 0%
+                        let bgColor = 'bg-slate-50 text-slate-500 border-slate-300 opacity-90';
                         let indicatorHtml = '';
                         
                         if (prog >= 100) {
                             bgColor = 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-200 shadow-lg';
                         } else if (prog > 0) {
                             bgColor = 'bg-amber-400 text-amber-900 border-amber-500 shadow-amber-200 shadow-lg';
-                            // เพิ่มเอฟเฟกต์กระพริบให้จุดที่กำลังก่อสร้าง
                             indicatorHtml = '<span class="absolute top-0 right-0 flex h-3 w-3 -mt-1 -mr-1"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span></span>';
                         }
 
@@ -369,7 +362,6 @@
                                 ${indicatorHtml}
                             </div>
                             <div class="w-3 h-3 bg-white border-2 border-slate-800 rounded-full mt-1 z-0 shadow-md"></div>
-                            
                             <div class="hidden group-hover:block absolute top-full mt-2 w-max max-w-[200px] bg-slate-800 text-white text-xs p-2 rounded shadow-xl z-20">
                                 <span class="text-amber-300 font-bold">งาน ${id}:</span> ${coords.name} <br>
                                 คืบหน้าแล้ว ${prog}%
@@ -378,8 +370,6 @@
                     }
                     document.getElementById('map-badges').innerHTML = mapHtml;
 
-
-                    // ส่วนสร้างตารางและกราฟแท่ง (เหมือนเดิม)
                     let html = '';
                     const chartLabels = [], chartCompMoney = [], chartRemMoney = [];
                     for (const [jobName, data] of Object.entries(grouped)) {
@@ -399,7 +389,6 @@
                     new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [ { label: 'เบิกจ่ายแล้ว', data: chartCompMoney, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'รอเบิกจ่าย', data: chartRemMoney, backgroundColor: '#cbd5e1', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
                 }
 
-                // โหลดขออนุมัติ
                 const appData = await fetchCSV(URLS.approvals);
                 if(appData.length > 0) {
                     let html = '';
@@ -410,7 +399,6 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // โหลดเอกสารสัญญา
                 const docsData = await fetchCSV(URLS.docs);
                 if(docsData.length > 0) {
                     let html = '';
