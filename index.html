@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แดชบอร์ดโครงการ V2</title>
+    <title>แดชบอร์ดโครงการ V3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -107,7 +107,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
 
         <div id="tab-charts" class="tab-content block">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-chart-donut text-indigo-500 mr-2"></i> สัดส่วนงบประมาณ</h3>
                     <div class="w-full max-w-[300px] mx-auto aspect-square">
@@ -119,6 +119,13 @@
                     <div class="w-full max-w-[300px] mx-auto aspect-square">
                         <canvas id="timeChart"></canvas>
                     </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-chart-column text-blue-500 mr-2"></i> งบประมาณแยกตามหมวดงาน (บาท)</h3>
+                <div class="w-full h-[350px] md:h-[450px]">
+                    <canvas id="jobBudgetBarChart"></canvas>
                 </div>
             </div>
         </div>
@@ -231,7 +238,7 @@
 
         async function loadData() {
             try {
-                // โหลดภาพรวม
+                // 1. โหลดข้อมูลภาพรวม
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
                     const valColumn = Object.keys(overviewData[0])[0]; 
@@ -277,7 +284,7 @@
                     });
                 }
 
-                // 📌 โหลดและจัดกลุ่มข้อมูลงานงวดเงิน (Pivot Table)
+                // 2. โหลดงานงวดเงิน (ทำตาราง และ เตรียมข้อมูลทำกราฟแท่ง)
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
                     const grouped = {};
@@ -289,28 +296,45 @@
                         const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
                         if(!jobName) return;
 
+                        // เพิ่มช่องเก็บ totalMoney รวมไว้ทำกราฟแท่ง
                         if(!grouped[jobName]) {
-                            grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0 };
+                            grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0, totalMoney: 0 };
                         }
 
-                        // นับยอดรวมจำนวนงวด
                         grouped[jobName].totalInst += 1;
                         grandTotalInst += 1;
+                        
+                        const money = safeParseFloat(row['เงิน']);
+                        grouped[jobName].totalMoney += money; // รวมเงินทั้งหมดทุกงวด
 
-                        // ตรวจสอบว่าคอลัมน์ "สถานะการตรวจรับ" เป็น True หรือไม่ (ครอบคลุมเว้นวรรค)
                         const statusVal = row['สถานะการตรวจรับ'];
                         if(statusVal && statusVal.toString().trim().toLowerCase() === 'true') {
                             grouped[jobName].compInst += 1;
                             grandCompInst += 1;
-                            
-                            const money = safeParseFloat(row['เงิน']);
                             grouped[jobName].compMoney += money;
                             grandCompMoney += money;
                         }
                     });
 
+                    // สร้าง HTML ตาราง
                     let html = '';
+                    
+                    // ตัวแปรเก็บข้อมูลกราฟแท่ง
+                    const chartLabels = [];
+                    const chartCompMoney = [];
+                    const chartRemMoney = [];
+
                     for (const [jobName, data] of Object.entries(grouped)) {
+                        // เก็บข้อมูลเตรียมทำกราฟ
+                        // ตัดคำว่า "งาน x: " ออก เพื่อให้ชื่อในกราฟไม่ยาวเกินไป
+                        let shortJobName = jobName;
+                        if(shortJobName.includes(': ')) shortJobName = shortJobName.split(': ')[1];
+                        
+                        chartLabels.push(shortJobName);
+                        chartCompMoney.push(data.compMoney);
+                        chartRemMoney.push(data.totalMoney - data.compMoney);
+
+                        // สร้างตาราง
                         const pct = data.totalInst > 0 ? Math.round((data.compInst / data.totalInst) * 100) : 0;
                         const isDone = data.compInst === data.totalInst && data.totalInst > 0;
                         
@@ -327,7 +351,6 @@
                         </tr>`;
                     }
 
-                    // สร้างบรรทัด Grand Total
                     const grandPct = grandTotalInst > 0 ? Math.round((grandCompInst / grandTotalInst) * 100) : 0;
                     html += `
                         <tr class="bg-indigo-50 border-t-2 border-indigo-200">
@@ -339,9 +362,49 @@
                         </tr>
                     `;
                     document.getElementById('installments-body').innerHTML = html;
+
+                    // 📌 วาดกราฟแท่ง (Bar Chart)
+                    new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [
+                                {
+                                    label: 'เบิกจ่ายแล้ว',
+                                    data: chartCompMoney,
+                                    backgroundColor: '#10b981', // สีเขียว
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'รอเบิกจ่าย',
+                                    data: chartRemMoney,
+                                    backgroundColor: '#cbd5e1', // สีเทา
+                                    borderRadius: 4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true, ticks: { maxRotation: 45, minRotation: 45 } },
+                                y: { stacked: true, beginAtZero: true }
+                            },
+                            plugins: {
+                                legend: { position: 'top' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString() + ' บาท';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
 
-                // โหลดขออนุมัติ
+                // 3. โหลดขออนุมัติ
                 const appData = await fetchCSV(URLS.approvals);
                 if(appData.length > 0) {
                     let html = '';
@@ -364,7 +427,7 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // โหลดเอกสารสัญญา
+                // 4. โหลดเอกสารสัญญา
                 const docsData = await fetchCSV(URLS.docs);
                 if(docsData.length > 0) {
                     let html = '';
