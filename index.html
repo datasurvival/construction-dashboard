@@ -225,8 +225,7 @@
                 // 1. โหลดข้อมูลภาพรวม (สรุปตรวจรับงาน)
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
-                    
-                    // 📌 ส่วนที่แก้ไข: ดึงชื่อคอลัมน์แรก (Index 0) มาใช้อัตโนมัติ ป้องกันปัญหาอักขระซ่อนเร้น
+                    // ดึงชื่อคอลัมน์แรกอัตโนมัติ (แก้ปัญหาอักขระซ่อนเร้นจาก Google Sheets)
                     const valColumn = Object.keys(overviewData[0])[0]; 
                     
                     const approved = parseFloat(overviewData[0][valColumn]) || 0;
@@ -237,36 +236,57 @@
                     const timeRem = parseFloat(overviewData[1]['เวลาคงเหลือ']) || 0;
                     const totalTime = timeElapsed + timeRem;
 
-                    // 📌 อัปเดตการ์ด: ถ้าอยากให้แสดงตัวเลขเต็มๆ 984,784,000 บาท ให้ใช้โค้ดด้านล่างนี้ครับ
+                    // 📌 1. อัปเดตการ์ดให้โชว์ตัวเลขเต็มๆ พร้อมใส่ลูกน้ำ และเปลี่ยนหน่วยเป็น 'บาท'
                     document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
                     document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
-                    
-                    // (แต่ถ้าอยากได้แบบ 984.78 ลบ. เหมือนเดิม ให้ใช้บรรทัดล่างนี้แทนครับ)
-                    // document.getElementById('card-total-budget').innerText = (totalBudget/1000000).toFixed(2) + ' ลบ.';
-                    // document.getElementById('card-approved').innerText = (approved/1000000).toFixed(2) + ' ลบ.';
+                    document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
+                    document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
 
-                    document.getElementById('card-total-time').innerText = totalTime + ' วัน';
-                    document.getElementById('card-remaining-time').innerText = timeRem + ' วัน';
-
+                    // 📌 2. วาดกราฟงบประมาณ (เพิ่มระบบ Tooltip ให้โชว์ตัวเลขเต็มเวลาเอาเมาส์ชี้)
                     new Chart(document.getElementById('budgetChart').getContext('2d'), {
                         type: 'doughnut',
                         data: {
                             labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'],
                             datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#f1f5f9'], borderWidth: 0, hoverOffset: 4 }]
                         },
-                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                        options: { 
+                            cutout: '75%', 
+                            plugins: { 
+                                legend: { position: 'bottom' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            // แทรกคำว่า บาท และใส่ลูกน้ำในกราฟ
+                                            return ' ' + context.label + ': ' + context.parsed.toLocaleString() + ' บาท';
+                                        }
+                                    }
+                                }
+                            } 
+                        }
                     });
 
+                    // 📌 3. วาดกราฟเวลา (เพิ่มระบบ Tooltip ให้โชว์คำว่า วัน)
                     new Chart(document.getElementById('timeChart').getContext('2d'), {
                         type: 'doughnut',
                         data: {
                             labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'],
                             datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#f59e0b', '#f1f5f9'], borderWidth: 0, hoverOffset: 4 }]
                         },
-                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                        options: { 
+                            cutout: '75%', 
+                            plugins: { 
+                                legend: { position: 'bottom' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ' ' + context.label + ': ' + context.parsed.toLocaleString() + ' วัน';
+                                        }
+                                    }
+                                }
+                            } 
+                        }
                     });
                 }
-
                 // โหลดงานงวดเงิน
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
@@ -346,5 +366,6 @@
     </script>
 </body>
 </html>
+
 
 
