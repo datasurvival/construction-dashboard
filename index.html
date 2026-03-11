@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แดชบอร์ดโครงการ V3</title>
+    <title>แดชบอร์ดโครงการ V4 (พร้อมแผนผัง)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,6 +16,8 @@
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .smooth-transition { transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        /* เอฟเฟกต์จุดกระพริบสำหรับงานที่กำลังทำ */
+        .ping-indicator { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -30,7 +32,6 @@
                     <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">โครงการก่อสร้างศูนย์ฝึกอบรมกองบัญชาการตำรวจสอบสวนกลาง ระยะที่ 4</h1>
                     <p class="text-sm font-medium text-slate-500 mt-1"><i class="fa-solid fa-building-shield mr-1"></i> ผู้บริหารสัญญา: สำนักงานส่งกำลังบำรุง</p>
                     <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-users mr-1"></i> หน่วยผู้ใช้ประโยชน์: กองบัญชาการตำรวจสอบสวนกลาง <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-helmet-safety mr-1"></i> ผู้รับจ้าง: กิจการร่วมค้าเอเอส</p>
-                    
                     <div id="project-status-badge" class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
                         <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังคำนวณสถานะ...
                     </div>
@@ -107,26 +108,33 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
 
         <div id="tab-charts" class="tab-content block">
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                    <i class="fa-solid fa-map-location-dot text-emerald-500 mr-2"></i> แผนผังความคืบหน้าก่อสร้าง (Interactive Map)
+                </h3>
+                <div class="relative w-full max-w-5xl mx-auto border-4 border-slate-200 rounded-xl bg-slate-50 overflow-hidden" id="map-container">
+                    
+                    <img src="map.jpg" alt="กรุณานำรูปภาพแผนผังมาใส่ในโฟลเดอร์และตั้งชื่อว่า map.jpg" class="w-full h-auto object-contain opacity-90" onerror="this.src='https://placehold.co/1200x800/e2e8f0/475569?text=Please+upload+map.jpg';">
+                    
+                    <div id="map-badges"></div>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">*เปอร์เซ็นต์ความคืบหน้าถูกดึงอัตโนมัติจากคอลัมน์ "ความก้าวหน้า %" ในชีทงานงวดเงิน</p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-chart-donut text-indigo-500 mr-2"></i> สัดส่วนงบประมาณ</h3>
-                    <div class="w-full max-w-[300px] mx-auto aspect-square">
-                        <canvas id="budgetChart"></canvas>
-                    </div>
+                    <div class="w-full max-w-[300px] mx-auto aspect-square"><canvas id="budgetChart"></canvas></div>
                 </div>
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i> สัดส่วนระยะเวลา</h3>
-                    <div class="w-full max-w-[300px] mx-auto aspect-square">
-                        <canvas id="timeChart"></canvas>
-                    </div>
+                    <div class="w-full max-w-[300px] mx-auto aspect-square"><canvas id="timeChart"></canvas></div>
                 </div>
             </div>
-            
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-chart-column text-blue-500 mr-2"></i> งบประมาณแยกตามหมวดงาน (บาท)</h3>
-                <div class="w-full h-[350px] md:h-[450px]">
-                    <canvas id="jobBudgetBarChart"></canvas>
-                </div>
+                <div class="w-full h-[350px] md:h-[450px]"><canvas id="jobBudgetBarChart"></canvas></div>
             </div>
         </div>
 
@@ -146,7 +154,7 @@
                                 <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
                             </tr>
                         </thead>
-                        <tbody id="installments-body" class="divide-y divide-slate-100">
+                        <tbody id="installments-body">
                             <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังประมวลผลข้อมูล...</td></tr>
                         </tbody>
                     </table>
@@ -166,7 +174,7 @@
                                 <th class="p-4 text-sm font-semibold text-slate-500 text-center">เอกสารอ้างอิง</th>
                             </tr>
                         </thead>
-                        <tbody id="approvals-body" class="divide-y divide-slate-100">
+                        <tbody id="approvals-body">
                             <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
@@ -196,8 +204,7 @@
         function updateProjectStatus() {
             const startDate = new Date('2025-11-14T00:00:00'); 
             const totalDays = 1080;
-            const todayDate = new Date();
-            const diffTime = todayDate - startDate;
+            const diffTime = new Date() - startDate;
             const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             const badgeEl = document.getElementById('project-status-badge');
             
@@ -236,9 +243,41 @@
             return parseFloat(cleanString) || 0;
         }
 
+        // ฟังก์ชันอัจฉริยะสำหรับแปลง % (แก้ปัญหาพิมพ์ 0.15 หรือ 15%)
+        function parseProgressPercentage(val) {
+            if (!val) return 0;
+            let str = val.toString().trim();
+            let num = parseFloat(str.replace(/,/g, '').replace(/%/g, ''));
+            if(isNaN(num)) return 0;
+            // ถ้าพิมพ์เปอร์เซ็นต์มาตรงๆ (เช่น 15%)
+            if(str.includes('%')) return num; 
+            // ถ้าพิมพ์เป็นทศนิยม (เช่น 0.15) แปลงให้เป็น 15
+            if(num <= 1 && num > 0) return num * 100;
+            return num; // กรณีพิมพ์เลข 15 มาเฉยๆ
+        }
+
+        // 📌 พิกัดของอาคารต่างๆ บนภาพแผนผัง (Top, Left)
+        // ** คุณสามารถแก้ตัวเลข % ตรงนี้เพื่อขยับหมุดให้ตรงกับภาพจริงได้เลย **
+        const MAP_COORDINATES = {
+            "1": { top: '50%', left: '70%', name: 'ผังบริเวณ' },
+            "2": { top: '80%', left: '30%', name: 'ส่วนประกอบอื่นๆ' },
+            "3": { top: '65%', left: '45%', name: 'อาคาร บก.' },
+            "4": { top: '45%', left: '75%', name: 'อาคาร CQB' },
+            "5": { top: '50%', left: '40%', name: 'อาคารยุทธวิธีทางน้ำ' },
+            "6": { top: '35%', left: '35%', name: 'แฟลต 5 ชั้น' },
+            "7": { top: '75%', left: '15%', name: 'อาคารทราบระยะ' },
+            "8": { top: '85%', left: '50%', name: 'บ้านพักขนาดใหญ่' },
+            "9": { top: '85%', left: '60%', name: 'บ้านพักขนาดกลาง' },
+            "10": { top: '85%', left: '70%', name: 'บ้านพักขนาดเล็ก' },
+            "11": { top: '60%', left: '20%', name: 'แฟลต ปทส.' },
+            "12": { top: '65%', left: '25%', name: 'อาคารจอดพาหนะ' },
+            "13": { top: '30%', left: '20%', name: 'ลานจอดฮ.' },
+            "14": { top: '30%', left: '80%', name: 'O Course' },
+            "15": { top: '25%', left: '30%', name: 'ฟื้นฟูสมรรถภาพ' }
+        };
+
         async function loadData() {
             try {
-                // 1. โหลดข้อมูลภาพรวม
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
                     const valColumn = Object.keys(overviewData[0])[0]; 
@@ -249,63 +288,52 @@
                     const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
                     const totalTime = timeElapsed + timeRem;
 
-                    const pctApproved = totalBudget > 0 ? ((approved / totalBudget) * 100).toFixed(2) : 0;
-                    const pctRemBudget = totalBudget > 0 ? ((remBudget / totalBudget) * 100).toFixed(2) : 0;
-                    const pctElapsed = totalTime > 0 ? ((timeElapsed / totalTime) * 100).toFixed(2) : 0;
-                    const pctRemTime = totalTime > 0 ? ((timeRem / totalTime) * 100).toFixed(2) : 0;
-
                     document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
                     document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
-                    document.getElementById('pct-approved').innerText = pctApproved + '%';
+                    document.getElementById('pct-approved').innerText = (totalBudget>0?((approved/totalBudget)*100).toFixed(2):0) + '%';
                     document.getElementById('card-rem-budget').innerText = remBudget.toLocaleString() + ' บาท';
-                    document.getElementById('pct-rem-budget').innerText = pctRemBudget + '%';
+                    document.getElementById('pct-rem-budget').innerText = (totalBudget>0?((remBudget/totalBudget)*100).toFixed(2):0) + '%';
                     document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
                     document.getElementById('card-elapsed-time').innerText = timeElapsed.toLocaleString() + ' วัน';
-                    document.getElementById('pct-elapsed-time').innerText = pctElapsed + '%';
+                    document.getElementById('pct-elapsed-time').innerText = (totalTime>0?((timeElapsed/totalTime)*100).toFixed(2):0) + '%';
                     document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
-                    document.getElementById('pct-rem-time').innerText = pctRemTime + '%';
+                    document.getElementById('pct-rem-time').innerText = (totalTime>0?((timeRem/totalTime)*100).toFixed(2):0) + '%';
 
-                    new Chart(document.getElementById('budgetChart').getContext('2d'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'],
-                            datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
-                        },
-                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' บาท'; } } } } }
-                    });
-
-                    new Chart(document.getElementById('timeChart').getContext('2d'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'],
-                            datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
-                        },
-                        options: { cutout: '75%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' วัน'; } } } } }
-                    });
+                    new Chart(document.getElementById('budgetChart').getContext('2d'), { type: 'doughnut', data: { labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'], datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#cbd5e1'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } } });
+                    new Chart(document.getElementById('timeChart').getContext('2d'), { type: 'doughnut', data: { labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'], datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } } });
                 }
 
-                // 2. โหลดงานงวดเงิน (ทำตาราง และ เตรียมข้อมูลทำกราฟแท่ง)
+                // โหลดงานงวดเงิน (วาดตาราง + กราฟแท่ง + แผนผังภาพ)
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
                     const grouped = {};
-                    let grandTotalInst = 0;
-                    let grandCompInst = 0;
-                    let grandCompMoney = 0;
+                    let grandTotalInst = 0, grandCompInst = 0, grandCompMoney = 0;
+                    const buildingProgress = {}; // ตัวแปรเก็บ % สำหรับวาดลงแผนผัง
 
                     instData.forEach(row => {
                         const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
-                        if(!jobName) return;
-
-                        // เพิ่มช่องเก็บ totalMoney รวมไว้ทำกราฟแท่ง
-                        if(!grouped[jobName]) {
-                            grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0, totalMoney: 0 };
+                        const groupName = row['ชื่องาน (group)'] ? row['ชื่องาน (group)'].trim() : '';
+                        
+                        // 1. เก็บความคืบหน้า (%) แยกตามหมวดอาคาร สำหรับวาดแผนผัง
+                        if (groupName && row['ความก้าวหน้า %']) {
+                            const match = groupName.match(/งาน\s*(\d+)/); // ดึงเลข 1-15 ออกมาจากชื่อ
+                            if (match) {
+                                const buildId = match[1];
+                                const progPct = parseProgressPercentage(row['ความก้าวหน้า %']);
+                                if (!buildingProgress[buildId] || progPct > buildingProgress[buildId]) {
+                                    buildingProgress[buildId] = progPct; // ดึงค่า % ที่มากที่สุดของอาคารนั้นมาใช้
+                                }
+                            }
                         }
 
+                        // 2. จัดกลุ่มทำตาราง
+                        if(!jobName) return;
+                        if(!grouped[jobName]) grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0, totalMoney: 0 };
+                        
                         grouped[jobName].totalInst += 1;
                         grandTotalInst += 1;
-                        
                         const money = safeParseFloat(row['เงิน']);
-                        grouped[jobName].totalMoney += money; // รวมเงินทั้งหมดทุกงวด
+                        grouped[jobName].totalMoney += money;
 
                         const statusVal = row['สถานะการตรวจรับ'];
                         if(statusVal && statusVal.toString().trim().toLowerCase() === 'true') {
@@ -316,143 +344,83 @@
                         }
                     });
 
-                    // สร้าง HTML ตาราง
-                    let html = '';
-                    
-                    // ตัวแปรเก็บข้อมูลกราฟแท่ง
-                    const chartLabels = [];
-                    const chartCompMoney = [];
-                    const chartRemMoney = [];
-
-                    for (const [jobName, data] of Object.entries(grouped)) {
-                        // เก็บข้อมูลเตรียมทำกราฟ
-                        // ตัดคำว่า "งาน x: " ออก เพื่อให้ชื่อในกราฟไม่ยาวเกินไป
-                        let shortJobName = jobName;
-                        if(shortJobName.includes(': ')) shortJobName = shortJobName.split(': ')[1];
+                    // 📌 ส่วนวาดป้ายคะแนนลงบนภาพแผนผัง (Map Overlay)
+                    let mapHtml = '';
+                    for (const [id, coords] of Object.entries(MAP_COORDINATES)) {
+                        const prog = buildingProgress[id] !== undefined ? buildingProgress[id].toFixed(0) : 0;
                         
+                        // กำหนดสีป้ายตาม % ความคืบหน้า
+                        let bgColor = 'bg-slate-50 text-slate-500 border-slate-300 opacity-90'; // งานยังไม่เดิน 0%
+                        let indicatorHtml = '';
+                        
+                        if (prog >= 100) {
+                            bgColor = 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-200 shadow-lg';
+                        } else if (prog > 0) {
+                            bgColor = 'bg-amber-400 text-amber-900 border-amber-500 shadow-amber-200 shadow-lg';
+                            // เพิ่มเอฟเฟกต์กระพริบให้จุดที่กำลังก่อสร้าง
+                            indicatorHtml = '<span class="absolute top-0 right-0 flex h-3 w-3 -mt-1 -mr-1"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span></span>';
+                        }
+
+                        mapHtml += `
+                        <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center hover:scale-110 transition-transform cursor-pointer group" 
+                             style="top: ${coords.top}; left: ${coords.left};">
+                            <div class="px-2 py-1 rounded-lg border text-xs md:text-sm font-bold relative ${bgColor} z-10 whitespace-nowrap">
+                                อาคาร ${id}: ${prog}%
+                                ${indicatorHtml}
+                            </div>
+                            <div class="w-3 h-3 bg-white border-2 border-slate-800 rounded-full mt-1 z-0 shadow-md"></div>
+                            
+                            <div class="hidden group-hover:block absolute top-full mt-2 w-max max-w-[200px] bg-slate-800 text-white text-xs p-2 rounded shadow-xl z-20">
+                                <span class="text-amber-300 font-bold">งาน ${id}:</span> ${coords.name} <br>
+                                คืบหน้าแล้ว ${prog}%
+                            </div>
+                        </div>`;
+                    }
+                    document.getElementById('map-badges').innerHTML = mapHtml;
+
+
+                    // ส่วนสร้างตารางและกราฟแท่ง (เหมือนเดิม)
+                    let html = '';
+                    const chartLabels = [], chartCompMoney = [], chartRemMoney = [];
+                    for (const [jobName, data] of Object.entries(grouped)) {
+                        let shortJobName = jobName.includes(': ') ? jobName.split(': ')[1] : jobName;
                         chartLabels.push(shortJobName);
                         chartCompMoney.push(data.compMoney);
                         chartRemMoney.push(data.totalMoney - data.compMoney);
 
-                        // สร้างตาราง
                         const pct = data.totalInst > 0 ? Math.round((data.compInst / data.totalInst) * 100) : 0;
                         const isDone = data.compInst === data.totalInst && data.totalInst > 0;
-                        
-                        const statusText = isDone ? 'เสร็จสมบูรณ์' : 'กำลังดำเนินการ';
                         const statusColor = isDone ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100';
 
-                        html += `
-                        <tr class="hover:bg-slate-50 border-b border-slate-50 transition-colors">
-                            <td class="p-4 text-slate-700 font-medium">${jobName}</td>
-                            <td class="p-4 text-center text-slate-500">${data.totalInst}</td>
-                            <td class="p-4 text-center text-slate-800 font-semibold">${data.compInst} <span class="text-xs text-slate-400 font-normal ml-1">(${pct}%)</span></td>
-                            <td class="p-4 text-right font-medium text-slate-800">${data.compMoney.toLocaleString()}</td>
-                            <td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span></td>
-                        </tr>`;
+                        html += `<tr class="border-b border-slate-50"><td class="p-4">${jobName}</td><td class="p-4 text-center">${data.totalInst}</td><td class="p-4 text-center">${data.compInst} (${pct}%)</td><td class="p-4 text-right">${data.compMoney.toLocaleString()}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${isDone?'เสร็จสมบูรณ์':'กำลังดำเนินการ'}</span></td></tr>`;
                     }
+                    document.getElementById('installments-body').innerHTML = html + `<tr class="bg-indigo-50 border-t-2 border-indigo-200"><td class="p-4 text-indigo-900 font-bold text-right">รวมทั้งหมด</td><td class="p-4 text-center text-indigo-900 font-bold">${grandTotalInst}</td><td class="p-4 text-center text-indigo-900 font-bold">${grandCompInst} (${grandTotalInst>0?Math.round((grandCompInst/grandTotalInst)*100):0}%)</td><td class="p-4 text-right text-indigo-900 font-bold">${grandCompMoney.toLocaleString()} บาท</td><td class="p-4">-</td></tr>`;
 
-                    const grandPct = grandTotalInst > 0 ? Math.round((grandCompInst / grandTotalInst) * 100) : 0;
-                    html += `
-                        <tr class="bg-indigo-50 border-t-2 border-indigo-200">
-                            <td class="p-4 text-indigo-900 font-bold text-right">รวมทั้งหมด</td>
-                            <td class="p-4 text-center text-indigo-900 font-bold">${grandTotalInst}</td>
-                            <td class="p-4 text-center text-indigo-900 font-bold">${grandCompInst} <span class="text-xs text-indigo-500 font-normal ml-1">(${grandPct}%)</span></td>
-                            <td class="p-4 text-right text-indigo-900 font-bold">${grandCompMoney.toLocaleString()} บาท</td>
-                            <td class="p-4 text-center font-bold text-indigo-900">-</td>
-                        </tr>
-                    `;
-                    document.getElementById('installments-body').innerHTML = html;
-
-                    // 📌 วาดกราฟแท่ง (Bar Chart)
-                    new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: chartLabels,
-                            datasets: [
-                                {
-                                    label: 'เบิกจ่ายแล้ว',
-                                    data: chartCompMoney,
-                                    backgroundColor: '#10b981', // สีเขียว
-                                    borderRadius: 4
-                                },
-                                {
-                                    label: 'รอเบิกจ่าย',
-                                    data: chartRemMoney,
-                                    backgroundColor: '#cbd5e1', // สีเทา
-                                    borderRadius: 4
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: { stacked: true, ticks: { maxRotation: 45, minRotation: 45 } },
-                                y: { stacked: true, beginAtZero: true }
-                            },
-                            plugins: {
-                                legend: { position: 'top' },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString() + ' บาท';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [ { label: 'เบิกจ่ายแล้ว', data: chartCompMoney, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'รอเบิกจ่าย', data: chartRemMoney, backgroundColor: '#cbd5e1', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
                 }
 
-                // 3. โหลดขออนุมัติ
+                // โหลดขออนุมัติ
                 const appData = await fetchCSV(URLS.approvals);
                 if(appData.length > 0) {
                     let html = '';
                     appData.forEach(row => {
                         if(!row['รายการขออนุมัติ']) return;
-                        const isApp = row['สถานะอนุมัติ/รออนุมัติ'] === 'อนุมัติ';
-                        const badge = isApp 
-                            ? `<span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">อนุมัติแล้ว</span>` 
-                            : `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium">รอพิจารณา</span>`;
-                        const link = row['Link'] ? `<a href="${row['Link']}" target="_blank" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '-';
-                        
-                        html += `
-                        <tr class="hover:bg-slate-50 border-b border-slate-50">
-                            <td class="p-4 text-slate-700">${row['รายการขออนุมัติ']}</td>
-                            <td class="p-4 text-slate-500 text-sm">${row['ลงวันที่']}</td>
-                            <td class="p-4 text-center">${badge}</td>
-                            <td class="p-4 text-center text-lg">${link}</td>
-                        </tr>`;
+                        html += `<tr class="border-b border-slate-50"><td class="p-4">${row['รายการขออนุมัติ']}</td><td class="p-4">${row['ลงวันที่']}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${row['สถานะอนุมัติ/รออนุมัติ']==='อนุมัติ'?'bg-indigo-100 text-indigo-700':'bg-amber-100 text-amber-700'}">${row['สถานะอนุมัติ/รออนุมัติ']==='อนุมัติ'?'อนุมัติแล้ว':'รอพิจารณา'}</span></td><td class="p-4 text-center">${row['Link']?`<a href="${row['Link']}" target="_blank" class="text-blue-500"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}</td></tr>`;
                     });
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // 4. โหลดเอกสารสัญญา
+                // โหลดเอกสารสัญญา
                 const docsData = await fetchCSV(URLS.docs);
                 if(docsData.length > 0) {
                     let html = '';
                     docsData.forEach(row => {
                         if(!row['รายการ']) return;
-                        const hasDoc = row['สถานะการอัปโหลด'] === 'True';
-                        const iconColor = hasDoc ? 'text-blue-500' : 'text-slate-300';
-                        const link = hasDoc ? row['ลิ้งค์'] : '#';
-                        
-                        html += `
-                        <a href="${link}" target="${hasDoc ? '_blank' : '_self'}" class="bg-white p-5 rounded-2xl border border-slate-200 hover:shadow-md hover:border-indigo-300 transition-all group flex items-start gap-4">
-                            <div class="bg-slate-50 p-3 rounded-xl group-hover:bg-indigo-50 transition-colors">
-                                <i class="fa-solid fa-file-pdf text-2xl ${iconColor}"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">${row['รายการ']}</h4>
-                                <p class="text-xs text-slate-400 mt-1">อัปเดต: ${row['วันที่สร้างเอกสาร'] || '-'}</p>
-                            </div>
-                        </a>`;
+                        html += `<a href="${row['สถานะการอัปโหลด']==='True'?row['ลิ้งค์']:'#'}" target="${row['สถานะการอัปโหลด']==='True'?'_blank':'_self'}" class="bg-white p-5 rounded-2xl border flex gap-4 hover:shadow"><i class="fa-solid fa-file-pdf text-2xl ${row['สถานะการอัปโหลด']==='True'?'text-blue-500':'text-slate-300'}"></i><div><h4 class="font-bold">${row['รายการ']}</h4><p class="text-xs text-slate-400">อัปเดต: ${row['วันที่สร้างเอกสาร']||'-'}</p></div></a>`;
                     });
                     document.getElementById('docs-grid').innerHTML = html;
                 }
-            } catch (e) {
-                console.error("Error Fetching Data:", e);
-            }
+            } catch (e) { console.error("Error:", e); }
         }
 
         loadData();
