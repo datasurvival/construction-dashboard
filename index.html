@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แดชบอร์ดโครงการก่อสร้างศูนย์ฝึกอบรมฯ</title>
+    <title>แดชบอร์ดโครงการ V2</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -126,7 +126,7 @@
         <div id="tab-installments" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> สรุปความคืบหน้ารายงาน</h3>
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> สรุปความคืบหน้ารายงาน (จัดกลุ่มตามอาคาร)</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -190,7 +190,6 @@
             const startDate = new Date('2025-11-14T00:00:00'); 
             const totalDays = 1080;
             const todayDate = new Date();
-            
             const diffTime = todayDate - startDate;
             const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             const badgeEl = document.getElementById('project-status-badge');
@@ -211,7 +210,6 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = 'tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition';
             });
@@ -233,7 +231,7 @@
 
         async function loadData() {
             try {
-                // 1. โหลดข้อมูลภาพรวม
+                // โหลดภาพรวม
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
                     const valColumn = Object.keys(overviewData[0])[0]; 
@@ -279,7 +277,7 @@
                     });
                 }
 
-                // 📌 2. โหลดงานงวดเงิน (จัดกลุ่มแบบ Pivot Table)
+                // 📌 โหลดและจัดกลุ่มข้อมูลงานงวดเงิน (Pivot Table)
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
                     const grouped = {};
@@ -287,19 +285,21 @@
                     let grandCompInst = 0;
                     let grandCompMoney = 0;
 
-                    // วนลูปเพื่อจัดกลุ่มข้อมูลตาม "ชื่องาน"
                     instData.forEach(row => {
-                        const jobName = row['ชื่องาน'];
-                        if(!jobName || jobName.trim() === '') return;
+                        const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
+                        if(!jobName) return;
 
                         if(!grouped[jobName]) {
                             grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0 };
                         }
 
+                        // นับยอดรวมจำนวนงวด
                         grouped[jobName].totalInst += 1;
                         grandTotalInst += 1;
 
-                        if(row['สถานะการตรวจรับ'] === 'True') {
+                        // ตรวจสอบว่าคอลัมน์ "สถานะการตรวจรับ" เป็น True หรือไม่ (ครอบคลุมเว้นวรรค)
+                        const statusVal = row['สถานะการตรวจรับ'];
+                        if(statusVal && statusVal.toString().trim().toLowerCase() === 'true') {
                             grouped[jobName].compInst += 1;
                             grandCompInst += 1;
                             
@@ -309,13 +309,11 @@
                         }
                     });
 
-                    // วาดตารางจากข้อมูลที่จัดกลุ่มแล้ว
                     let html = '';
                     for (const [jobName, data] of Object.entries(grouped)) {
                         const pct = data.totalInst > 0 ? Math.round((data.compInst / data.totalInst) * 100) : 0;
                         const isDone = data.compInst === data.totalInst && data.totalInst > 0;
                         
-                        // เช็คสถานะ (สีเขียวเสร็จสมบูรณ์ / สีเหลืองกำลังดำเนินการ)
                         const statusText = isDone ? 'เสร็จสมบูรณ์' : 'กำลังดำเนินการ';
                         const statusColor = isDone ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100';
 
@@ -325,13 +323,11 @@
                             <td class="p-4 text-center text-slate-500">${data.totalInst}</td>
                             <td class="p-4 text-center text-slate-800 font-semibold">${data.compInst} <span class="text-xs text-slate-400 font-normal ml-1">(${pct}%)</span></td>
                             <td class="p-4 text-right font-medium text-slate-800">${data.compMoney.toLocaleString()}</td>
-                            <td class="p-4 text-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span>
-                            </td>
+                            <td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span></td>
                         </tr>`;
                     }
 
-                    // สร้างบรรทัดสรุปผลรวม (Grand Total) ล่างสุด
+                    // สร้างบรรทัด Grand Total
                     const grandPct = grandTotalInst > 0 ? Math.round((grandCompInst / grandTotalInst) * 100) : 0;
                     html += `
                         <tr class="bg-indigo-50 border-t-2 border-indigo-200">
@@ -342,11 +338,10 @@
                             <td class="p-4 text-center font-bold text-indigo-900">-</td>
                         </tr>
                     `;
-
                     document.getElementById('installments-body').innerHTML = html;
                 }
 
-                // 3. โหลดขออนุมัติ
+                // โหลดขออนุมัติ
                 const appData = await fetchCSV(URLS.approvals);
                 if(appData.length > 0) {
                     let html = '';
@@ -369,7 +364,7 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // 4. โหลดเอกสารสัญญา
+                // โหลดเอกสารสัญญา
                 const docsData = await fetchCSV(URLS.docs);
                 if(docsData.length > 0) {
                     let html = '';
@@ -392,7 +387,6 @@
                     });
                     document.getElementById('docs-grid').innerHTML = html;
                 }
-
             } catch (e) {
                 console.error("Error Fetching Data:", e);
             }
