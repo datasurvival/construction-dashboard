@@ -5,364 +5,387 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แดชบอร์ดโครงการก่อสร้างศูนย์ฝึกอบรมฯ</title>
     
-   <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-    body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; }
-    .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-    .smooth-transition { transition: all 0.3s ease; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-</style>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; }
+        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .smooth-transition { transition: all 0.3s ease; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
 </head>
 <body class="text-slate-800">
 
     <header class="glass-header sticky top-0 z-50 border-b border-slate-200 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4 w-full">
-            <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-indigo-500 shadow-sm shrink-0">
-                <img src="https://cdn-icons-png.flaticon.com/512/3039/3039394.png" alt="Logo" class="w-10 h-10 object-contain">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4 w-full">
+                <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-indigo-500 shadow-sm shrink-0">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3039/3039394.png" alt="Logo" class="w-10 h-10 object-contain">
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">โครงการก่อสร้างศูนย์ฝึกอบรมกองบัญชาการตำรวจสอบสวนกลาง ระยะที่ 4</h1>
+                    <p class="text-sm font-medium text-slate-500 mt-1"><i class="fa-solid fa-building-shield mr-1"></i> ผู้บริหารสัญญา: สำนักงานส่งกำลังบำรุง</p>
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-users mr-1"></i> หน่วยผู้ใช้ประโยชน์: กองบัญชาการตำรวจสอบสวนกลาง <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-helmet-safety mr-1"></i> ผู้รับจ้าง: กิจการร่วมค้าเอเอส</p>
+                    
+                    <div id="project-status-badge" class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังคำนวณสถานะ...
+                    </div>
+                </div>
             </div>
-            <div class="flex-1">
-                <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">โครงการก่อสร้างศูนย์ฝึกอบรมกองบัญชาการตำรวจสอบสวนกลาง ระยะที่ 4</h1>
-                <p class="text-sm font-medium text-slate-500 mt-1"><i class="fa-solid fa-building-shield mr-1"></i> ผู้บริหารสัญญา: สำนักงานส่งกำลังบำรุง</p>
-                <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-users mr-1"></i> หน่วยผู้ใช้ประโยชน์: กองบัญชาการตำรวจสอบสวนกลาง <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-helmet-safety mr-1"></i> ผู้รับจ้าง: กิจการร่วมค้าเอเอส</p>
+            <div class="text-right hidden sm:block shrink-0">
+                <p class="text-xs text-slate-400">อัปเดตข้อมูลล่าสุด</p>
+                <p class="text-sm font-semibold text-emerald-600" id="last-update"><i class="fa-solid fa-clock mr-1"></i> วันนี้</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-indigo-900 pt-8 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-white text-lg font-medium mb-4 opacity-90">ภาพรวมความคืบหน้า</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
-                <div id="project-status-badge" class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังคำนวณสถานะ...
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-indigo-500 relative overflow-hidden">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-sack-dollar text-indigo-500 mr-2"></i>งบประมาณทั้งสิ้น</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-2" id="card-total-budget">กำลังโหลด...</h3>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-emerald-500 relative overflow-hidden flex flex-col justify-between">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-money-bill-trend-up text-emerald-500 mr-2"></i>เบิกจ่ายสะสม</p>
+                    <div class="flex items-end justify-between mt-2">
+                        <h3 class="text-2xl font-bold text-emerald-600" id="card-approved">กำลังโหลด...</h3>
+                        <span id="pct-approved" class="text-sm font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md mb-1">-%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-slate-400 relative overflow-hidden flex flex-col justify-between">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-wallet text-slate-400 mr-2"></i>งบประมาณคงเหลือ</p>
+                    <div class="flex items-end justify-between mt-2">
+                        <h3 class="text-2xl font-bold text-slate-600" id="card-rem-budget">กำลังโหลด...</h3>
+                        <span id="pct-rem-budget" class="text-sm font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-md mb-1">-%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-amber-500 relative overflow-hidden mt-2 md:mt-0">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-regular fa-calendar-days text-amber-500 mr-2"></i>ระยะเวลาโครงการ</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-2" id="card-total-time">กำลังโหลด...</h3>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-blue-500 relative overflow-hidden mt-2 md:mt-0 flex flex-col justify-between">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-person-digging text-blue-500 mr-2"></i>ระยะเวลาดำเนินงาน</p>
+                    <div class="flex items-end justify-between mt-2">
+                        <h3 class="text-2xl font-bold text-blue-600" id="card-elapsed-time">กำลังโหลด...</h3>
+                        <span id="pct-elapsed-time" class="text-sm font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md mb-1">-%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 shadow-lg border-l-4 border-rose-500 relative overflow-hidden mt-2 md:mt-0 flex flex-col justify-between">
+                    <p class="text-sm font-medium text-slate-500"><i class="fa-solid fa-hourglass-half text-rose-500 mr-2"></i>ระยะเวลาคงเหลือ</p>
+                    <div class="flex items-end justify-between mt-2">
+                        <h3 class="text-2xl font-bold text-rose-600" id="card-remaining-time">กำลังโหลด...</h3>
+                        <span id="pct-rem-time" class="text-sm font-bold bg-rose-100 text-rose-700 px-2 py-1 rounded-md mb-1">-%</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+        <div class="bg-white rounded-xl shadow-md p-2 flex overflow-x-auto hide-scrollbar border border-slate-100">
+            <button onclick="switchTab('tab-charts')" id="btn-charts" class="tab-btn active-tab whitespace-nowrap px-6 py-3 rounded-lg text-sm font-semibold smooth-transition bg-indigo-50 text-indigo-700">
+                <i class="fa-solid fa-chart-pie mr-2"></i> สัดส่วนโครงการ
+            </button>
+            <button onclick="switchTab('tab-installments')" id="btn-installments" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
+                <i class="fa-solid fa-list-check mr-2"></i> งานงวดเงิน
+            </button>
+            <button onclick="switchTab('tab-approvals')" id="btn-approvals" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
+                <i class="fa-solid fa-file-signature mr-2"></i> ขออนุมัติวัสดุ
+            </button>
+            <button onclick="switchTab('tab-docs')" id="btn-docs" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
+                <i class="fa-solid fa-folder-open mr-2"></i> เอกสารแนบสัญญา
+            </button>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
+
+        <div id="tab-charts" class="tab-content block">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-chart-donut text-indigo-500 mr-2"></i> สัดส่วนงบประมาณ</h3>
+                    <div class="w-full max-w-[300px] mx-auto aspect-square">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i> สัดส่วนระยะเวลา</h3>
+                    <div class="w-full max-w-[300px] mx-auto aspect-square">
+                        <canvas id="timeChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="text-right hidden sm:block shrink-0">
-            <p class="text-xs text-slate-400">อัปเดตข้อมูลล่าสุด</p>
-            <p class="text-sm font-semibold text-emerald-600" id="last-update"><i class="fa-solid fa-clock mr-1"></i> วันนี้</p>
-        </div>
-    </div>
-</header>
 
-<div class="bg-indigo-900 pt-8 pb-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-white text-lg font-medium mb-4 opacity-90">ภาพรวมความคืบหน้า</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white rounded-xl p-5 shadow-lg border-b-4 border-indigo-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-50 rounded-full z-0 opacity-50"></div>
-                <p class="text-sm font-medium text-slate-500 relative z-10"><i class="fa-solid fa-sack-dollar text-indigo-500 mr-2"></i>งบประมาณทั้งสิ้น</p>
-                <h3 class="text-2xl font-bold text-slate-800 mt-2 relative z-10" id="card-total-budget">กำลังโหลด...</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 shadow-lg border-b-4 border-emerald-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-50 rounded-full z-0 opacity-50"></div>
-                <p class="text-sm font-medium text-slate-500 relative z-10"><i class="fa-solid fa-money-bill-trend-up text-emerald-500 mr-2"></i>ตรวจรับแล้ว</p>
-                <h3 class="text-2xl font-bold text-emerald-600 mt-2 relative z-10" id="card-approved">กำลังโหลด...</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 shadow-lg border-b-4 border-amber-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-amber-50 rounded-full z-0 opacity-50"></div>
-                <p class="text-sm font-medium text-slate-500 relative z-10"><i class="fa-regular fa-calendar-days text-amber-500 mr-2"></i>ระยะเวลาโครงการ</p>
-                <h3 class="text-2xl font-bold text-slate-800 mt-2 relative z-10" id="card-total-time">กำลังโหลด...</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 shadow-lg border-b-4 border-rose-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-rose-50 rounded-full z-0 opacity-50"></div>
-                <p class="text-sm font-medium text-slate-500 relative z-10"><i class="fa-solid fa-hourglass-half text-rose-500 mr-2"></i>เวลาคงเหลือ</p>
-                <h3 class="text-2xl font-bold text-rose-600 mt-2 relative z-10" id="card-remaining-time">กำลังโหลด...</h3>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-    <div class="bg-white rounded-xl shadow-md p-2 flex overflow-x-auto hide-scrollbar border border-slate-100">
-        <button onclick="switchTab('tab-charts')" id="btn-charts" class="tab-btn active-tab whitespace-nowrap px-6 py-3 rounded-lg text-sm font-semibold smooth-transition bg-indigo-50 text-indigo-700">
-            <i class="fa-solid fa-chart-pie mr-2"></i> สัดส่วนโครงการ
-        </button>
-        <button onclick="switchTab('tab-installments')" id="btn-installments" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
-            <i class="fa-solid fa-list-check mr-2"></i> งานงวดเงิน
-        </button>
-        <button onclick="switchTab('tab-approvals')" id="btn-approvals" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
-            <i class="fa-solid fa-file-signature mr-2"></i> ขออนุมัติวัสดุ
-        </button>
-        <button onclick="switchTab('tab-docs')" id="btn-docs" class="tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition">
-            <i class="fa-solid fa-folder-open mr-2"></i> เอกสารแนบสัญญา
-        </button>
-    </div>
-</div>
-
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
-
-    <div id="tab-charts" class="tab-content block">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-chart-donut text-indigo-500 mr-2"></i> สัดส่วนงบประมาณ</h3>
-                <div class="w-full max-w-[300px] mx-auto aspect-square">
-                    <canvas id="budgetChart"></canvas>
+        <div id="tab-installments" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> รายละเอียดสถานะงวดงาน</h3>
                 </div>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i> สัดส่วนระยะเวลา</h3>
-                <div class="w-full max-w-[300px] mx-auto aspect-square">
-                    <canvas id="timeChart"></canvas>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white border-b border-slate-200">
+                                <th class="p-4 text-sm font-semibold text-slate-500">ชื่องาน (รายการ)</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">งวดที่</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-right">จำนวนเงิน (บาท)</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="installments-body" class="divide-y divide-slate-100">
+                            <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="tab-installments" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> รายละเอียดสถานะงวดงาน</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-white border-b border-slate-200">
-                            <th class="p-4 text-sm font-semibold text-slate-500">ชื่องาน (รายการ)</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500 text-center">งวดที่</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500 text-right">จำนวนเงิน (บาท)</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="installments-body" class="divide-y divide-slate-100">
-                        <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
-                    </tbody>
-                </table>
+        <div id="tab-approvals" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="p-4 text-sm font-semibold text-slate-500">รายการขออนุมัติ</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500">วันที่ลง</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">เอกสารอ้างอิง</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvals-body" class="divide-y divide-slate-100">
+                            <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="tab-approvals" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200">
-                            <th class="p-4 text-sm font-semibold text-slate-500">รายการขออนุมัติ</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500">วันที่ลง</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
-                            <th class="p-4 text-sm font-semibold text-slate-500 text-center">เอกสารอ้างอิง</th>
-                        </tr>
-                    </thead>
-                    <tbody id="approvals-body" class="divide-y divide-slate-100">
-                        <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
-                    </tbody>
-                </table>
+        <div id="tab-docs" class="tab-content hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="docs-grid">
+                <p class="text-slate-500 col-span-full text-center py-8">กำลังโหลดข้อมูลเอกสาร...</p>
             </div>
         </div>
-    </div>
 
-    <div id="tab-docs" class="tab-content hidden">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="docs-grid">
-            <p class="text-slate-500 col-span-full text-center py-8">กำลังโหลดข้อมูลเอกสาร...</p>
-        </div>
-    </div>
+    </main>
 
-</main>
+    <script>
+        // ลิงก์ข้อมูล
+        const URLS = {
+            overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
+            installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
+            approvals: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=0&single=true&output=csv',
+            docs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=655008589&single=true&output=csv'
+        };
 
-<script>
-    // ลิงก์ข้อมูลของคุณ
-    const URLS = {
-        overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
-        installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
-        approvals: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=0&single=true&output=csv',
-        docs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=655008589&single=true&output=csv'
-    };
+        const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+        document.getElementById('last-update').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ข้อมูล ณ ${today}`;
 
-    const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-    document.getElementById('last-update').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ข้อมูล ณ ${today}`;
-
-    function updateProjectStatus() {
-        const startDate = new Date('2025-11-14T00:00:00'); 
-        const totalDays = 1080;
-        const todayDate = new Date();
-        
-        const diffTime = todayDate - startDate;
-        const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const badgeEl = document.getElementById('project-status-badge');
-        
-        if (daysElapsed < 0) {
-            badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm';
-            badgeEl.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> รอเริ่มโครงการ';
-        } else if (daysElapsed <= totalDays) {
-            badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm';
-            badgeEl.innerHTML = '<i class="fa-solid fa-person-digging mr-1"></i> กำลังดำเนินการ (วันที่ ' + daysElapsed + ' / 1080)';
-        } else {
-            badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm';
-            badgeEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> เกินกำหนดสัญญา';
+        function updateProjectStatus() {
+            const startDate = new Date('2025-11-14T00:00:00'); 
+            const totalDays = 1080;
+            const todayDate = new Date();
+            
+            const diffTime = todayDate - startDate;
+            const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const badgeEl = document.getElementById('project-status-badge');
+            
+            if (daysElapsed < 0) {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> รอเริ่มโครงการ';
+            } else if (daysElapsed <= totalDays) {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-person-digging mr-1"></i> กำลังดำเนินการ (วันที่ ' + daysElapsed + ' / 1080)';
+            } else {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> เกินกำหนดสัญญา';
+            }
         }
-    }
-    updateProjectStatus();
+        updateProjectStatus();
 
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(tabId).classList.remove('hidden');
-        
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.className = 'tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition';
-        });
-        const activeBtn = document.getElementById('btn-' + tabId.split('-')[1]);
-        activeBtn.className = 'tab-btn active-tab whitespace-nowrap px-6 py-3 rounded-lg text-sm font-semibold smooth-transition bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100';
-    }
-
-    function fetchCSV(url) {
-        return new Promise((resolve, reject) => {
-            Papa.parse(url, { download: true, header: true, complete: results => resolve(results.data), error: reject });
-        });
-    }
-
-    // 📌 ฟังก์ชันพระเอกของเรา: ล้างลูกน้ำและเปลี่ยนเป็นตัวเลขให้คำนวณได้ชัวร์ 100%
-    function safeParseFloat(val) {
-        if (!val) return 0;
-        // ลบลูกน้ำ (,) หรือช่องว่างออกให้หมดก่อนแปลงเป็นตัวเลข
-        let cleanString = val.toString().replace(/,/g, '').replace(/\s/g, '');
-        return parseFloat(cleanString) || 0;
-    }
-
-    async function loadData() {
-        try {
-            // 1. ภาพรวม
-            const overviewData = await fetchCSV(URLS.overview);
-            if(overviewData.length >= 2) {
-                const valColumn = Object.keys(overviewData[0])[0]; 
-                
-                // ใช้ฟังก์ชันล้างลูกน้ำที่เราสร้างไว้
-                const approved = safeParseFloat(overviewData[0][valColumn]);
-                const remBudget = safeParseFloat(overviewData[1][valColumn]);
-                const totalBudget = approved + remBudget;
-                
-                const timeElapsed = safeParseFloat(overviewData[0]['เวลาคงเหลือ']);
-                const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
-                const totalTime = timeElapsed + timeRem;
-
-                document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
-                document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
-                document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
-                document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
-
-                new Chart(document.getElementById('budgetChart').getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'],
-                        datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#f1f5f9'], borderWidth: 0, hoverOffset: 4 }]
-                    },
-                    options: { 
-                        cutout: '75%', 
-                        plugins: { 
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        // ใช้ context.raw จะเอาตัวเลขดิบๆ มาโชว์พร้อมใส่ลูกน้ำให้
-                                        return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' บาท';
-                                    }
-                                }
-                            }
-                        } 
-                    }
-                });
-
-                new Chart(document.getElementById('timeChart').getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'],
-                        datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#f59e0b', '#f1f5f9'], borderWidth: 0, hoverOffset: 4 }]
-                    },
-                    options: { 
-                        cutout: '75%', 
-                        plugins: { 
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' วัน';
-                                    }
-                                }
-                            }
-                        } 
-                    }
-                });
-            }
-
-            // 2. งานงวดเงิน
-            const instData = await fetchCSV(URLS.installments);
-            if(instData.length > 0) {
-                let html = '';
-                instData.forEach(row => {
-                    if(!row['ชื่องาน']) return;
-                    
-                    // ใช้ฟังก์ชันล้างลูกน้ำกับช่องจำนวนเงินด้วย
-                    const amt = safeParseFloat(row['เงิน']);
-                    
-                    const isDone = row['สถานะการตรวจรับ'] === 'True';
-                    const badge = isDone 
-                        ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check mr-1"></i> ตรวจรับแล้ว</span>` 
-                        : `<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium"><i class="fa-solid fa-hourglass-half mr-1"></i> รอดำเนินการ</span>`;
-                    
-                    html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50">
-                        <td class="p-4 text-slate-700 font-medium">${row['ชื่องาน']}</td>
-                        <td class="p-4 text-center text-slate-500">${row['งวดที่']}</td>
-                        <td class="p-4 text-right font-medium text-slate-800">${amt.toLocaleString()}</td>
-                        <td class="p-4 text-center">${badge}</td>
-                    </tr>`;
-                });
-                document.getElementById('installments-body').innerHTML = html;
-            }
-
-            // 3. ขออนุมัติ
-            const appData = await fetchCSV(URLS.approvals);
-            if(appData.length > 0) {
-                let html = '';
-                appData.forEach(row => {
-                    if(!row['รายการขออนุมัติ']) return;
-                    const isApp = row['สถานะอนุมัติ/รออนุมัติ'] === 'อนุมัติ';
-                    const badge = isApp 
-                        ? `<span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">อนุมัติแล้ว</span>` 
-                        : `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium">รอพิจารณา</span>`;
-                    const link = row['Link'] ? `<a href="${row['Link']}" target="_blank" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '-';
-                    
-                    html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50">
-                        <td class="p-4 text-slate-700">${row['รายการขออนุมัติ']}</td>
-                        <td class="p-4 text-slate-500 text-sm">${row['ลงวันที่']}</td>
-                        <td class="p-4 text-center">${badge}</td>
-                        <td class="p-4 text-center text-lg">${link}</td>
-                    </tr>`;
-                });
-                document.getElementById('approvals-body').innerHTML = html;
-            }
-
-            // 4. เอกสารสัญญา
-            const docsData = await fetchCSV(URLS.docs);
-            if(docsData.length > 0) {
-                let html = '';
-                docsData.forEach(row => {
-                    if(!row['รายการ']) return;
-                    const hasDoc = row['สถานะการอัปโหลด'] === 'True';
-                    const iconColor = hasDoc ? 'text-blue-500' : 'text-slate-300';
-                    const link = hasDoc ? row['ลิ้งค์'] : '#';
-                    
-                    html += `
-                    <a href="${link}" target="${hasDoc ? '_blank' : '_self'}" class="bg-white p-5 rounded-2xl border border-slate-200 hover:shadow-md hover:border-indigo-300 transition-all group flex items-start gap-4">
-                        <div class="bg-slate-50 p-3 rounded-xl group-hover:bg-indigo-50 transition-colors">
-                            <i class="fa-solid fa-file-pdf text-2xl ${iconColor}"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">${row['รายการ']}</h4>
-                            <p class="text-xs text-slate-400 mt-1">อัปเดต: ${row['วันที่สร้างเอกสาร'] || '-'}</p>
-                        </div>
-                    </a>`;
-                });
-                document.getElementById('docs-grid').innerHTML = html;
-            }
-
-        } catch (e) {
-            console.error("Error Fetching Data:", e);
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition';
+            });
+            const activeBtn = document.getElementById('btn-' + tabId.split('-')[1]);
+            activeBtn.className = 'tab-btn active-tab whitespace-nowrap px-6 py-3 rounded-lg text-sm font-semibold smooth-transition bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100';
         }
-    }
 
-    loadData();
-</script>
+        function fetchCSV(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, { download: true, header: true, complete: results => resolve(results.data), error: reject });
+            });
+        }
 
+        function safeParseFloat(val) {
+            if (!val) return 0;
+            let cleanString = val.toString().replace(/,/g, '').replace(/\s/g, '');
+            return parseFloat(cleanString) || 0;
+        }
 
+        async function loadData() {
+            try {
+                // 1. โหลดข้อมูลภาพรวม
+                const overviewData = await fetchCSV(URLS.overview);
+                if(overviewData.length >= 2) {
+                    const valColumn = Object.keys(overviewData[0])[0]; 
+                    
+                    const approved = safeParseFloat(overviewData[0][valColumn]);
+                    const remBudget = safeParseFloat(overviewData[1][valColumn]);
+                    const totalBudget = approved + remBudget;
+                    
+                    const timeElapsed = safeParseFloat(overviewData[0]['เวลาคงเหลือ']);
+                    const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
+                    const totalTime = timeElapsed + timeRem;
 
+                    // คำนวณเปอร์เซ็นต์
+                    const pctApproved = totalBudget > 0 ? ((approved / totalBudget) * 100).toFixed(2) : 0;
+                    const pctRemBudget = totalBudget > 0 ? ((remBudget / totalBudget) * 100).toFixed(2) : 0;
+                    const pctElapsed = totalTime > 0 ? ((timeElapsed / totalTime) * 100).toFixed(2) : 0;
+                    const pctRemTime = totalTime > 0 ? ((timeRem / totalTime) * 100).toFixed(2) : 0;
 
+                    // ใส่ข้อมูลลงในหน้าเว็บ (ตัวเลข + %)
+                    document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
+                    
+                    document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
+                    document.getElementById('pct-approved').innerText = pctApproved + '%';
+                    
+                    document.getElementById('card-rem-budget').innerText = remBudget.toLocaleString() + ' บาท';
+                    document.getElementById('pct-rem-budget').innerText = pctRemBudget + '%';
+
+                    document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
+                    
+                    document.getElementById('card-elapsed-time').innerText = timeElapsed.toLocaleString() + ' วัน';
+                    document.getElementById('pct-elapsed-time').innerText = pctElapsed + '%';
+                    
+                    document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
+                    document.getElementById('pct-rem-time').innerText = pctRemTime + '%';
+
+                    // วาดกราฟงบประมาณ
+                    new Chart(document.getElementById('budgetChart').getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['เบิกจ่ายแล้ว', 'คงเหลือ'],
+                            datasets: [{ data: [approved, remBudget], backgroundColor: ['#10b981', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
+                        },
+                        options: { 
+                            cutout: '75%', 
+                            plugins: { 
+                                legend: { position: 'bottom' },
+                                tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' บาท'; } } }
+                            } 
+                        }
+                    });
+
+                    // วาดกราฟเวลา
+                    new Chart(document.getElementById('timeChart').getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['เวลาที่ใช้ไป', 'เวลาคงเหลือ'],
+                            datasets: [{ data: [timeElapsed, timeRem], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0, hoverOffset: 4 }]
+                        },
+                        options: { 
+                            cutout: '75%', 
+                            plugins: { 
+                                legend: { position: 'bottom' },
+                                tooltip: { callbacks: { label: function(context) { return ' ' + context.label + ': ' + context.raw.toLocaleString() + ' วัน'; } } }
+                            } 
+                        }
+                    });
+                }
+
+                // โหลดงานงวดเงิน
+                const instData = await fetchCSV(URLS.installments);
+                if(instData.length > 0) {
+                    let html = '';
+                    instData.forEach(row => {
+                        if(!row['ชื่องาน']) return;
+                        const amt = safeParseFloat(row['เงิน']);
+                        const isDone = row['สถานะการตรวจรับ'] === 'True';
+                        const badge = isDone 
+                            ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check mr-1"></i> ตรวจรับแล้ว</span>` 
+                            : `<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium"><i class="fa-solid fa-hourglass-half mr-1"></i> รอดำเนินการ</span>`;
+                        
+                        html += `
+                        <tr class="hover:bg-slate-50 border-b border-slate-50">
+                            <td class="p-4 text-slate-700 font-medium">${row['ชื่องาน']}</td>
+                            <td class="p-4 text-center text-slate-500">${row['งวดที่']}</td>
+                            <td class="p-4 text-right font-medium text-slate-800">${amt.toLocaleString()}</td>
+                            <td class="p-4 text-center">${badge}</td>
+                        </tr>`;
+                    });
+                    document.getElementById('installments-body').innerHTML = html;
+                }
+
+                // โหลดขออนุมัติ
+                const appData = await fetchCSV(URLS.approvals);
+                if(appData.length > 0) {
+                    let html = '';
+                    appData.forEach(row => {
+                        if(!row['รายการขออนุมัติ']) return;
+                        const isApp = row['สถานะอนุมัติ/รออนุมัติ'] === 'อนุมัติ';
+                        const badge = isApp 
+                            ? `<span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">อนุมัติแล้ว</span>` 
+                            : `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium">รอพิจารณา</span>`;
+                        const link = row['Link'] ? `<a href="${row['Link']}" target="_blank" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '-';
+                        
+                        html += `
+                        <tr class="hover:bg-slate-50 border-b border-slate-50">
+                            <td class="p-4 text-slate-700">${row['รายการขออนุมัติ']}</td>
+                            <td class="p-4 text-slate-500 text-sm">${row['ลงวันที่']}</td>
+                            <td class="p-4 text-center">${badge}</td>
+                            <td class="p-4 text-center text-lg">${link}</td>
+                        </tr>`;
+                    });
+                    document.getElementById('approvals-body').innerHTML = html;
+                }
+
+                // โหลดเอกสารสัญญา
+                const docsData = await fetchCSV(URLS.docs);
+                if(docsData.length > 0) {
+                    let html = '';
+                    docsData.forEach(row => {
+                        if(!row['รายการ']) return;
+                        const hasDoc = row['สถานะการอัปโหลด'] === 'True';
+                        const iconColor = hasDoc ? 'text-blue-500' : 'text-slate-300';
+                        const link = hasDoc ? row['ลิ้งค์'] : '#';
+                        
+                        html += `
+                        <a href="${link}" target="${hasDoc ? '_blank' : '_self'}" class="bg-white p-5 rounded-2xl border border-slate-200 hover:shadow-md hover:border-indigo-300 transition-all group flex items-start gap-4">
+                            <div class="bg-slate-50 p-3 rounded-xl group-hover:bg-indigo-50 transition-colors">
+                                <i class="fa-solid fa-file-pdf text-2xl ${iconColor}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">${row['รายการ']}</h4>
+                                <p class="text-xs text-slate-400 mt-1">อัปเดต: ${row['วันที่สร้างเอกสาร'] || '-'}</p>
+                            </div>
+                        </a>`;
+                    });
+                    document.getElementById('docs-grid').innerHTML = html;
+                }
+
+            } catch (e) {
+                console.error("Error Fetching Data:", e);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
