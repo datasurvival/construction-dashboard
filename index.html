@@ -114,3 +114,590 @@
             </button>
         </div>
     </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20">
+
+        <div id="tab-charts" class="tab-content block">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                    <i class="fa-solid fa-map-location-dot text-emerald-500 mr-2"></i> แผนผังความคืบหน้าก่อสร้าง
+                </h3>
+                <div class="relative w-full max-w-5xl mx-auto border-4 border-slate-200 rounded-xl bg-slate-50 overflow-hidden" id="map-container">
+                    <img src="map.jpg" alt="แผนผังโครงการ" class="w-full h-auto object-contain opacity-90" onerror="this.src='https://placehold.co/1200x800/e2e8f0/475569?text=Please+upload+map.jpg';">
+                    <div id="map-badges"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-building text-indigo-500 mr-2"></i> ภาพรวมการก่อสร้างทั้งหมด</h3>
+                    <div class="w-full flex-1 min-h-[250px]"><canvas id="buildingStatusChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-700 mb-2 flex items-center"><i class="fa-solid fa-money-check-dollar text-emerald-500 mr-2"></i> งบประมาณแยกตามปี</h3>
+                    <div class="mb-4">
+                        <p class="text-sm text-slate-500">รวมงบประมาณที่ได้รับ (บาท)</p>
+                        <h4 class="text-3xl font-bold text-slate-800" id="yearly-total-display">985,055,000</h4>
+                    </div>
+                    <div class="w-full flex-1 min-h-[220px]"><canvas id="yearlyBudgetChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-chart-column text-blue-500 mr-2"></i> งบประมาณแยกตามหมวดงาน (บาท)</h3>
+                <div class="w-full h-[350px] md:h-[450px]"><canvas id="jobBudgetBarChart"></canvas></div>
+            </div>
+        </div>
+
+        <div id="tab-installments" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-500 mr-2"></i> สรุปความคืบหน้ารายงาน (จัดกลุ่มตามอาคาร)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white border-b border-slate-200">
+                                <th class="p-4 text-sm font-semibold text-slate-500">ชื่องาน</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">ต้องตรวจรับ<br><span class="text-xs font-normal">(งวด)</span></th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">ตรวจรับแล้ว<br><span class="text-xs font-normal">(งวด)</span></th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-right">จำนวนเงินที่เบิก<br><span class="text-xs font-normal">(บาท)</span></th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="installments-body">
+                            <tr><td colspan="5" class="p-8 text-center text-slate-400">กำลังประมวลผลข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-approvals" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="p-4 text-sm font-semibold text-slate-500">รายการขออนุมัติ</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500">วันที่ลง</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">สถานะ</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 text-center">เอกสารอ้างอิง</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvals-body">
+                            <tr><td colspan="4" class="p-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-plan" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+                
+                <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+                    <div class="shrink-0">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fa-solid fa-calendar-check text-indigo-500 mr-2"></i> ไทม์ไลน์แผนงานก่อสร้าง</h3>
+                        <p class="text-sm text-slate-500">ค้นหาตามหมวดงาน หรือช่วงเวลาที่ดำเนินการ</p>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full xl:w-auto">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">เลือกอาคาร / หมวดหลัก</label>
+                            <select id="filter-category" onchange="filterPlanData()" class="w-full sm:w-56 border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 bg-white shadow-sm cursor-pointer">
+                                <option value="all">🏢 แสดงทุกหมวดงาน</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">สถานะเวลา</label>
+                            <select id="filter-status" onchange="filterPlanData()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 bg-white shadow-sm cursor-pointer">
+                                <option value="all">🔍 แสดงทุกสถานะเวลา</option>
+                                <option value="inprogress">⏳ อยู่ในช่วงดำเนินการ</option>
+                                <option value="completed">🏁 ถึงกำหนดแล้วเสร็จ</option>
+                                <option value="notstarted">⏸️ ยังไม่ถึงกำหนดเริ่ม</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="resetPlanFilter()" class="h-[38px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 rounded-lg text-sm font-medium transition shadow-sm border border-slate-200" title="ล้างการค้นหา">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> ล้างค่า
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="plan-timeline-container" class="space-y-6">
+                    <p class="text-center text-slate-400 py-8"><i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังประมวลผลข้อมูลแผนงาน...</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="tab-docs" class="tab-content hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="docs-grid">
+                <p class="text-slate-500 col-span-full text-center py-8">กำลังโหลดข้อมูลเอกสาร...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const URLS = {
+            overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
+            installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
+            approvals: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=0&single=true&output=csv',
+            docs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=655008589&single=true&output=csv',
+            plan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2017221579&single=true&output=csv'
+        };
+
+        const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+        document.getElementById('last-update').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ข้อมูล ณ ${today}`;
+
+        let globalPlanData = []; 
+
+        function updateProjectStatus() {
+            const startDate = new Date('2025-11-14T00:00:00'); 
+            const totalDays = 1080;
+            const diffTime = new Date() - startDate;
+            const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const badgeEl = document.getElementById('project-status-badge');
+            
+            if (daysElapsed < 0) {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> รอเริ่มโครงการ';
+            } else if (daysElapsed <= totalDays) {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-person-digging mr-1"></i> กำลังดำเนินการ (วันที่ ' + daysElapsed + ' / 1080)';
+            } else {
+                badgeEl.className = 'mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm';
+                badgeEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> เกินกำหนดสัญญา';
+            }
+        }
+        updateProjectStatus();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn whitespace-nowrap px-6 py-3 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 smooth-transition';
+            });
+            const activeBtn = document.getElementById('btn-' + tabId.split('-')[1]);
+            activeBtn.className = 'tab-btn active-tab whitespace-nowrap px-6 py-3 rounded-lg text-sm font-semibold smooth-transition bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100';
+        }
+
+        function fetchCSV(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, { download: true, header: true, complete: results => resolve(results.data), error: reject });
+            });
+        }
+
+        function safeParseFloat(val) {
+            if (!val) return 0;
+            let cleanString = val.toString().replace(/,/g, '').replace(/\s/g, '');
+            return parseFloat(cleanString) || 0;
+        }
+
+        // 📌 [ตัวการที่หายไป!] ฟังก์ชันแปลงเลขเปอร์เซ็นต์
+        function parseProgressPercentage(val) {
+            if (!val) return 0;
+            let str = val.toString().trim();
+            let num = parseFloat(str.replace(/,/g, '').replace(/%/g, ''));
+            if(isNaN(num)) return 0;
+            if(str.includes('%')) return num; 
+            if(num <= 1 && num > 0 && !str.includes('%')) return num * 100;
+            return num; 
+        }
+
+        // 📌 แปลงวันที่ภาษาอังกฤษ
+        function parseENDate(dateStr) {
+            if (!dateStr || dateStr.trim() === '') return null;
+            const d = new Date(dateStr);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function formatDateTH(dateObj) {
+            if (!dateObj) return '-';
+            return dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // 📌 ประมวลผลแผนงานแบบ WBS (Level 1, 2, 3)
+        function processPlanData(data) {
+            let processed = [];
+            let currentL2 = 'หมวดงานทั่วไป';
+            let currentL3 = 'รายการทั่วไป';
+
+            const rawPlans = data.map((row, i) => {
+                const code = row['รหัสงาน'] ? row['รหัสงาน'].toString().trim() : '';
+                let isSummary = false;
+                if (i + 1 < data.length) {
+                    const nextCode = data[i + 1]['รหัสงาน'] ? data[i + 1]['รหัสงาน'].toString().trim() : '';
+                    if (nextCode.startsWith(code + '.')) isSummary = true;
+                }
+                return {
+                    ...row,
+                    code: code,
+                    level: code ? code.split('.').length : 0,
+                    isSummary: isSummary,
+                    name: row['ชื่องาน'] ? row['ชื่องาน'].trim() : '',
+                    duration: row['ระยะเวลา'] || '-',
+                    startDate: parseENDate(row['คาดว่าเริ่มดำเนินการ']),
+                    endDate: parseENDate(row['คาดว่าแล้วเสร็จ'])
+                };
+            }).filter(p => p.code);
+
+            rawPlans.forEach(p => {
+                if (p.level === 2) {
+                    currentL2 = p.name;
+                    currentL3 = 'หมวดงานย่อย';
+                } else if (p.level === 3 && p.isSummary) {
+                    currentL3 = p.name;
+                }
+                
+                if (!p.isSummary && p.level > 1) {
+                    processed.push({
+                        ...p,
+                        l2: currentL2,
+                        l3: currentL3
+                    });
+                }
+            });
+
+            return processed;
+        }
+
+        function populateCategoryDropdown(data) {
+            const categories = new Set(data.map(item => item.l2));
+            const dropdown = document.getElementById('filter-category');
+            dropdown.innerHTML = '<option value="all">🏢 แสดงทุกอาคาร/หมวดงาน</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function filterPlanData() {
+            const cat = document.getElementById('filter-category').value;
+            const status = document.getElementById('filter-status').value;
+            
+            let filtered = globalPlanData;
+
+            if (cat !== 'all') {
+                filtered = filtered.filter(item => item.l2 === cat);
+            }
+
+            if (status !== 'all') {
+                const now = new Date();
+                filtered = filtered.filter(item => {
+                    if (!item.startDate || !item.endDate) return false;
+                    
+                    if (status === 'completed') return now > item.endDate;
+                    if (status === 'inprogress') return now >= item.startDate && now <= item.endDate;
+                    if (status === 'notstarted') return now < item.startDate;
+                    return true;
+                });
+            }
+
+            renderPlanTimeline(filtered);
+        }
+
+        function resetPlanFilter() {
+            document.getElementById('filter-category').value = 'all';
+            document.getElementById('filter-status').value = 'all';
+            filterPlanData();
+        }
+
+        function renderPlanTimeline(dataToRender) {
+            const container = document.getElementById('plan-timeline-container');
+            
+            if (dataToRender.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-300"><i class="fa-solid fa-clipboard-list text-4xl text-slate-300 mb-3 block"></i><p class="text-slate-500 font-medium">ไม่พบแผนงานในช่วงเวลาที่คุณระบุ</p></div>`;
+                return;
+            }
+
+            const groupedPlans = {};
+            dataToRender.forEach(item => {
+                if (!groupedPlans[item.l2]) groupedPlans[item.l2] = {};
+                if (!groupedPlans[item.l2][item.l3]) groupedPlans[item.l2][item.l3] = [];
+                groupedPlans[item.l2][item.l3].push(item);
+            });
+
+            let html = '';
+            const now = new Date();
+            
+            for (const [l2, l3Groups] of Object.entries(groupedPlans)) {
+                html += `
+                <div class="mb-10 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-indigo-900 border-b-2 border-indigo-100 pb-3 mb-6 flex items-center">
+                        <i class="fa-solid fa-building text-indigo-500 text-xl mr-3"></i> ${l2}
+                    </h3>
+                `;
+                
+                for (const [l3, tasks] of Object.entries(l3Groups)) {
+                    const l3Label = l3 === 'หมวดงานย่อย' ? 'รายการดำเนินงาน' : l3;
+                    html += `
+                    <div class="mb-6 ml-1 sm:ml-4">
+                        <h4 class="text-sm font-bold text-slate-700 mb-4 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg inline-flex items-center shadow-sm">
+                            <i class="fa-solid fa-layer-group text-indigo-400 mr-2"></i> ${l3Label}
+                        </h4>
+                        <div class="timeline-container ml-3 space-y-4">
+                    `;
+                    
+                    tasks.forEach(task => {
+                        const sDate = formatDateTH(task.startDate);
+                        const eDate = formatDateTH(task.endDate);
+                        
+                        let timePct = 0;
+                        let statusBadge = '';
+                        let barColor = '';
+                        
+                        if (!task.startDate || !task.endDate) {
+                            timePct = 0;
+                            statusBadge = '<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] ml-2">ไม่มีข้อมูลวันที่</span>';
+                            barColor = 'bg-slate-200';
+                        } else if (now > task.endDate) {
+                            timePct = 100;
+                            statusBadge = '<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] ml-2"><i class="fa-solid fa-flag-checkered mr-1"></i> ถึงกำหนดแผน</span>';
+                            barColor = 'bg-slate-400';
+                        } else if (now >= task.startDate && now <= task.endDate) {
+                            const total = task.endDate.getTime() - task.startDate.getTime();
+                            const elapsed = now.getTime() - task.startDate.getTime();
+                            timePct = Math.round((elapsed / total) * 100);
+                            statusBadge = '<span class="bg-indigo-50 text-indigo-600 border border-indigo-200 px-2 py-0.5 rounded text-[10px] ml-2 font-bold animate-pulse"><i class="fa-solid fa-person-digging mr-1"></i> อยู่ในระยะเวลาแผน</span>';
+                            barColor = 'bg-indigo-500';
+                        } else {
+                            timePct = 0;
+                            statusBadge = '<span class="bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded text-[10px] ml-2"><i class="fa-solid fa-pause mr-1"></i> ยังไม่ถึงกำหนด</span>';
+                            barColor = 'bg-slate-200';
+                        }
+                        
+                        const dotColor = (now >= task.startDate && now <= task.endDate) ? 'bg-indigo-500 ring-indigo-100' : 'bg-slate-300 ring-slate-50';
+                        
+                        html += `
+                            <div class="hover-card relative bg-white border border-slate-100 rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all cursor-default group">
+                                <div class="timeline-dot absolute -left-[1.95rem] top-5 w-3.5 h-3.5 rounded-full ${dotColor} ring-4 transition-all group-hover:scale-125"></div>
+                                
+                                <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-3">
+                                    <h5 class="font-bold text-slate-800 text-sm flex items-center flex-wrap gap-y-1">
+                                        <span class="text-indigo-500 font-medium mr-2">${task.code}</span> ${task.name} ${statusBadge}
+                                    </h5>
+                                    <div class="flex items-center gap-3 text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shrink-0 w-fit">
+                                        <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i> ${sDate} - ${eDate}</span>
+                                        <span class="text-slate-300">|</span>
+                                        <span><i class="fa-solid fa-stopwatch text-slate-400 mr-1"></i> ${task.duration}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-full mt-2">
+                                    <div class="flex justify-between text-[11px] mb-1">
+                                        <span class="text-slate-400">สถานะเวลาตามแผนปัจจุบัน (Time Elapsed)</span>
+                                        <span class="font-bold text-slate-500">${timePct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 rounded-full h-1.5 shadow-inner">
+                                        <div class="${barColor} h-1.5 rounded-full transition-all duration-1000" style="width: ${timePct}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        const MAP_COORDINATES = {
+            "1": { top: '50%', left: '70%', name: 'ผังบริเวณ' },
+            "2": { top: '80%', left: '30%', name: 'ส่วนประกอบอื่นๆ' },
+            "3": { top: '65%', left: '45%', name: 'อาคาร บก.' },
+            "4": { top: '45%', left: '75%', name: 'อาคาร CQB' },
+            "5": { top: '50%', left: '40%', name: 'อาคารยุทธวิธีทางน้ำ' },
+            "6": { top: '35%', left: '35%', name: 'แฟลต 5 ชั้น' },
+            "7": { top: '75%', left: '15%', name: 'อาคารทราบระยะ' },
+            "8": { top: '85%', left: '50%', name: 'บ้านพักขนาดใหญ่' },
+            "9": { top: '85%', left: '60%', name: 'บ้านพักขนาดกลาง' },
+            "10": { top: '85%', left: '70%', name: 'บ้านพักขนาดเล็ก' },
+            "11": { top: '60%', left: '20%', name: 'แฟลต ปทส.' },
+            "12": { top: '65%', left: '25%', name: 'อาคารจอดพาหนะ' },
+            "13": { top: '30%', left: '20%', name: 'ลานจอดฮ.' },
+            "14": { top: '30%', left: '80%', name: 'O Course' },
+            "15": { top: '25%', left: '30%', name: 'ฟื้นฟูสมรรถภาพ' }
+        };
+
+        async function loadData() {
+            try {
+                const overviewData = await fetchCSV(URLS.overview);
+                if(overviewData.length >= 2) {
+                    const valColumn = Object.keys(overviewData[0])[0]; 
+                    const approved = safeParseFloat(overviewData[0][valColumn]);
+                    const remBudget = safeParseFloat(overviewData[1][valColumn]);
+                    const totalBudget = approved + remBudget;
+                    const timeElapsed = safeParseFloat(overviewData[0]['เวลาคงเหลือ']);
+                    const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
+                    const totalTime = timeElapsed + timeRem;
+
+                    document.getElementById('card-total-budget').innerText = totalBudget.toLocaleString() + ' บาท';
+                    document.getElementById('card-approved').innerText = approved.toLocaleString() + ' บาท';
+                    document.getElementById('pct-approved').innerText = (totalBudget>0?((approved/totalBudget)*100).toFixed(2):0) + '%';
+                    document.getElementById('card-rem-budget').innerText = remBudget.toLocaleString() + ' บาท';
+                    document.getElementById('pct-rem-budget').innerText = (totalBudget>0?((remBudget/totalBudget)*100).toFixed(2):0) + '%';
+                    document.getElementById('card-total-time').innerText = totalTime.toLocaleString() + ' วัน';
+                    document.getElementById('card-elapsed-time').innerText = timeElapsed.toLocaleString() + ' วัน';
+                    document.getElementById('pct-elapsed-time').innerText = (totalTime>0?((timeElapsed/totalTime)*100).toFixed(2):0) + '%';
+                    document.getElementById('card-remaining-time').innerText = timeRem.toLocaleString() + ' วัน';
+                    document.getElementById('pct-rem-time').innerText = (totalTime>0?((timeRem/totalTime)*100).toFixed(2):0) + '%';
+                }
+
+                document.getElementById('yearly-total-display').innerText = (985055000).toLocaleString();
+
+                const instData = await fetchCSV(URLS.installments);
+                if(instData.length > 0) {
+                    const grouped = {};
+                    let grandTotalInst = 0, grandCompInst = 0, grandCompMoney = 0;
+                    const buildingProgress = {};
+
+                    instData.forEach(row => {
+                        const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
+                        const groupName = row['ชื่องาน (group)'] ? row['ชื่องาน (group)'].trim() : '';
+                        
+                        if (groupName && row['ความก้าวหน้า %']) {
+                            const match = groupName.match(/งาน\s*(\d+)/);
+                            if (match) {
+                                const buildId = match[1];
+                                // ฟังก์ชัน parseProgressPercentage กลับมาทำงานได้ปกติแล้ว!
+                                const progPct = parseProgressPercentage(row['ความก้าวหน้า %']);
+                                if (!buildingProgress[buildId] || progPct > buildingProgress[buildId]) {
+                                    buildingProgress[buildId] = progPct;
+                                }
+                            }
+                        }
+
+                        if(!jobName) return;
+                        if(!grouped[jobName]) grouped[jobName] = { totalInst: 0, compInst: 0, compMoney: 0, totalMoney: 0 };
+                        
+                        grouped[jobName].totalInst += 1;
+                        grandTotalInst += 1;
+                        const money = safeParseFloat(row['เงิน']);
+                        grouped[jobName].totalMoney += money;
+
+                        const statusVal = row['สถานะการตรวจรับ'];
+                        if(statusVal && statusVal.toString().trim().toLowerCase() === 'true') {
+                            grouped[jobName].compInst += 1;
+                            grandCompInst += 1;
+                            grouped[jobName].compMoney += money;
+                            grandCompMoney += money;
+                        }
+                    });
+
+                    let buildingCounts = { 'เสร็จสมบูรณ์': 0, 'กำลังก่อสร้าง': 0, 'ยังไม่เริ่ม': 0 };
+                    for (let i = 1; i <= 15; i++) {
+                        const prog = buildingProgress[i] || 0;
+                        if (prog >= 100) buildingCounts['เสร็จสมบูรณ์']++;
+                        else if (prog > 0) buildingCounts['กำลังก่อสร้าง']++;
+                        else buildingCounts['ยังไม่เริ่ม']++;
+                    }
+                    new Chart(document.getElementById('buildingStatusChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['เสร็จสมบูรณ์', 'กำลังก่อสร้าง', 'ยังไม่เริ่ม'],
+                            datasets: [{
+                                label: 'จำนวนอาคาร',
+                                data: [buildingCounts['เสร็จสมบูรณ์'], buildingCounts['กำลังก่อสร้าง'], buildingCounts['ยังไม่เริ่ม']],
+                                backgroundColor: ['#10b981', '#fbbf24', '#cbd5e1'],
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                        }
+                    });
+
+                    let html = '';
+                    const chartLabels = [], chartCompMoney = [], chartRemMoney = [];
+                    for (const [jobName, data] of Object.entries(grouped)) {
+                        let shortJobName = jobName.includes(': ') ? jobName.split(': ')[1] : jobName;
+                        chartLabels.push(shortJobName);
+                        chartCompMoney.push(data.compMoney);
+                        chartRemMoney.push(data.totalMoney - data.compMoney);
+
+                        const pct = data.totalInst > 0 ? Math.round((data.compInst / data.totalInst) * 100) : 0;
+                        const isDone = data.compInst === data.totalInst && data.totalInst > 0;
+                        const statusColor = isDone ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100';
+
+                        html += `<tr class="border-b border-slate-50"><td class="p-4">${jobName}</td><td class="p-4 text-center">${data.totalInst}</td><td class="p-4 text-center">${data.compInst} (${pct}%)</td><td class="p-4 text-right">${data.compMoney.toLocaleString()}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${isDone?'เสร็จสมบูรณ์':'กำลังดำเนินการ'}</span></td></tr>`;
+                    }
+                    document.getElementById('installments-body').innerHTML = html + `<tr class="bg-indigo-50 border-t-2 border-indigo-200"><td class="p-4 text-indigo-900 font-bold text-right">รวมทั้งหมด</td><td class="p-4 text-center text-indigo-900 font-bold">${grandTotalInst}</td><td class="p-4 text-center text-indigo-900 font-bold">${grandCompInst} (${grandTotalInst>0?Math.round((grandCompInst/grandTotalInst)*100):0}%)</td><td class="p-4 text-right text-indigo-900 font-bold">${grandCompMoney.toLocaleString()} บาท</td><td class="p-4">-</td></tr>`;
+
+                    new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [ { label: 'เบิกจ่ายแล้ว', data: chartCompMoney, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'รอเบิกจ่าย', data: chartRemMoney, backgroundColor: '#cbd5e1', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
+                }
+
+                const yearlyLabels = ['ปี 2568', 'ปี 2569', 'ปี 2570', 'ปี 2571'];
+                const yearlyBudgetData = [197011000, 76672800, 328751700, 383019500]; 
+
+                new Chart(document.getElementById('yearlyBudgetChart').getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: yearlyLabels,
+                        datasets: [{
+                            label: 'งบประมาณ (บาท)',
+                            data: yearlyBudgetData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#10b981',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: function(context) { return context.parsed.y.toLocaleString() + ' บาท'; } } }
+                        },
+                        scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return (value / 1000000) + 'M'; } } } }
+                    }
+                });
+
+                const appData = await fetchCSV(URLS.approvals);
+                if(appData.length > 0) {
+                    let html = '';
+                    appData.forEach(row => {
+                        if(!row['รายการขออนุมัติ']) return;
+                        html += `<tr class="border-b border-slate-50"><td class="p-4">${row['รายการขออนุมัติ']}</td><td class="p-4">${row['ลงวันที่']}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${row['สถานะอนุมัติ/รออนุมัติ']==='อนุมัติ'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${row['สถานะอนุมัติ/รออนุมัติ']==='อนุมัติ'?'อนุมัติแล้ว':'รอพิจารณา'}</span></td><td class="p-4 text-center">${row['Link']?`<a href="${row['Link']}" target="_blank" class="text-blue-500"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}</td></tr>`;
+                    });
+                    document.getElementById('approvals-body').innerHTML = html;
+                }
+
+                // 📌 โหลดข้อมูลแผนงาน (WBS)
+                const planDataRaw = await fetchCSV(URLS.plan);
+                if (planDataRaw.length > 0) {
+                    globalPlanData = processPlanData(planDataRaw);
+                    populateCategoryDropdown(globalPlanData);
+                    renderPlanTimeline(globalPlanData);
+                }
+
+                const docsData = await fetchCSV(URLS.docs);
+                if(docsData.length > 0) {
+                    let html = '';
+                    docsData.forEach(row => {
+                        if(!row['รายการ']) return;
+                        html += `<a href="${row['สถานะการอัปโหลด']==='True'?row['ลิ้งค์']:'#'}" target="${row['สถานะการอัปโหลด']==='True'?'_blank':'_self'}" class="bg-white p-5 rounded-2xl border flex gap-4 hover:shadow"><i class="fa-solid fa-file-pdf text-2xl ${row['สถานะการอัปโหลด']==='True'?'text-blue-500':'text-slate-300'}"></i><div><h4 class="font-bold">${row['รายการ']}</h4><p class="text-xs text-slate-400">อัปเดต: ${row['วันที่สร้างเอกสาร']||'-'}</p></div></a>`;
+                    });
+                    document.getElementById('docs-grid').innerHTML = html;
+                }
+            } catch (e) { console.error("Error:", e); }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
