@@ -16,11 +16,11 @@
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .smooth-transition { transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .ping-indicator { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
         
-        /* สไตล์พิเศษสำหรับ Timeline */
-        .timeline-container { position: relative; border-left: 2px solid #e2e8f0; margin-left: 1rem; padding-left: 1.5rem; }
-        .timeline-dot { position: absolute; left: -0.4rem; top: 1.5rem; width: 0.75rem; height: 0.75rem; border-radius: 50%; background-color: #3b82f6; border: 2px solid white; box-shadow: 0 0 0 2px #e2e8f0; }
+        /* สไตล์พิเศษสำหรับ Timeline แบบจัดกลุ่ม */
+        .timeline-container { position: relative; border-left: 2px dashed #cbd5e1; margin-left: 1rem; padding-left: 1.5rem; }
+        .timeline-dot { position: absolute; left: -0.45rem; top: 1.5rem; width: 0.85rem; height: 0.85rem; border-radius: 50%; background-color: #cbd5e1; border: 2px solid white; box-shadow: 0 0 0 2px #f1f5f9; transition: all 0.3s; }
+        .hover-card:hover .timeline-dot { background-color: #6366f1; box-shadow: 0 0 0 3px #e0e7ff; scale: 1.2; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -28,7 +28,6 @@
     <header class="glass-header sticky top-0 z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4 w-full">
-                
                 <div class="flex items-center gap-2 shrink-0">
                     <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-indigo-500 shadow-sm">
                         <img src="https://logistics.police.go.th/wp-content/uploads/2023/11/%E0%B8%AD%E0%B8%B3%E0%B8%99%E0%B8%A7%E0%B8%A2%E0%B8%81%E0%B8%B2%E0%B8%A3.png" alt="logo1" class="w-10 h-10 object-contain">
@@ -202,29 +201,29 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
                     <div>
                         <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fa-solid fa-calendar-check text-indigo-500 mr-2"></i> ไทม์ไลน์แผนงานก่อสร้าง</h3>
-                        <p class="text-sm text-slate-500">กรองดูแผนงานตามหมวดหมู่ หรือดูเฉพาะงานที่ล่าช้าได้ง่ายๆ</p>
+                        <p class="text-sm text-slate-500">ติดตามความคืบหน้างาน เปรียบเทียบแผนที่ตั้งไว้กับผลงานจริง</p>
                     </div>
                     
                     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <div class="flex-1 md:w-48">
-                            <select id="filter-category" onchange="filterPlanDataDropdown()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500 bg-white">
-                                <option value="all">แสดงทุกหมวดงาน</option>
-                                </select>
+                        <div class="flex-1 md:w-56">
+                            <select id="filter-category" onchange="filterPlanDataDropdown()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50 hover:bg-white cursor-pointer smooth-transition">
+                                <option value="all">📁 แสดงทุกหมวดงาน</option>
+                            </select>
                         </div>
                         
-                        <div class="flex-1 md:w-48">
-                            <select id="filter-status" onchange="filterPlanDataDropdown()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500 bg-white">
-                                <option value="all">แสดงทุกสถานะ</option>
+                        <div class="flex-1 md:w-56">
+                            <select id="filter-status" onchange="filterPlanDataDropdown()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50 hover:bg-white cursor-pointer smooth-transition">
+                                <option value="all">🔍 แสดงทุกสถานะ</option>
                                 <option value="delayed">⚠️ งานล่าช้ากว่าแผน</option>
-                                <option value="inprogress">⏳ กำลังดำเนินการ</option>
-                                <option value="completed">✅ เสร็จสมบูรณ์</option>
+                                <option value="inprogress">⏳ กำลังดำเนินการตามแผน</option>
+                                <option value="completed">✅ งานเสร็จสมบูรณ์</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div id="plan-timeline-container" class="space-y-6">
-                    <p class="text-center text-slate-400 py-8">กำลังประมวลผลแผนงาน...</p>
+                    <p class="text-center text-slate-400 py-8">กำลังประมวลผลข้อมูลแผนงาน...</p>
                 </div>
 
             </div>
@@ -239,12 +238,15 @@
     </main>
 
     <script>
+        // ⚠️ หมายเหตุ: ตรง URLS.plan ผมยังใช้ลิงก์เดิมที่คุณเคยให้นะครับ 
+        // หากไฟล์แผนงานใหม่ (ลิงก์ edit ที่คุณเพิ่งส่งมา) ยังไม่ได้แชร์เป็น "Publish to Web" 
+        // รบกวนไปกด Publish to web เป็น CSV แล้วนำลิงก์มาเปลี่ยนตรงบรรทัดนี้นะครับ
         const URLS = {
             overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
             installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
             approvals: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=0&single=true&output=csv',
             docs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=655008589&single=true&output=csv',
-            plan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2017221579&single=true&output=csv'
+            plan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2017221579&single=true&output=csv' 
         };
 
         const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -300,20 +302,21 @@
             let num = parseFloat(str.replace(/,/g, '').replace(/%/g, ''));
             if(isNaN(num)) return 0;
             if(str.includes('%')) return num; 
-            if(num <= 1 && num > 0) return num * 100;
+            if(num <= 1 && num > 0 && !str.includes('%')) return num * 100;
             return num; 
         }
 
-        // 📌 สร้างตัวเลือกหมวดหมู่งานอัตโนมัติจากข้อมูล
+        // 📌 สร้างตัวเลือก Dropdown จากคอลัมน์ "หมวดงาน"
         function populateCategoryDropdown(data) {
             const categories = new Set();
             data.forEach(row => {
-                if (row['รายการ'] && row['รายการ'].trim() !== '') {
-                    categories.add(row['รายการ'].trim());
+                if (row['หมวดงาน'] && row['หมวดงาน'].trim() !== '') {
+                    categories.add(row['หมวดงาน'].trim());
                 }
             });
             
             const dropdown = document.getElementById('filter-category');
+            dropdown.innerHTML = '<option value="all">📁 แสดงทุกหมวดงาน</option>';
             categories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
@@ -322,27 +325,25 @@
             });
         }
 
-        // 📌 ฟังก์ชันกรองข้อมูลตาม Dropdown
+        // 📌 ฟังก์ชันกรองข้อมูลตามเงื่อนไข Dropdown
         function filterPlanDataDropdown() {
             const selectedCat = document.getElementById('filter-category').value;
             const selectedStatus = document.getElementById('filter-status').value;
 
             let filteredData = globalPlanData;
 
-            // กรองหมวดหมู่
             if (selectedCat !== 'all') {
-                filteredData = filteredData.filter(row => row['รายการ'] && row['รายการ'].trim() === selectedCat);
+                filteredData = filteredData.filter(row => row['หมวดงาน'] && row['หมวดงาน'].trim() === selectedCat);
             }
 
-            // กรองสถานะ
             if (selectedStatus !== 'all') {
                 filteredData = filteredData.filter(plan => {
                     const planPct = parseProgressPercentage(plan['แผนความก้าวหน้า']);
                     const actualPct = parseProgressPercentage(plan['ผลความก้าวหน้า']);
                     
                     if (selectedStatus === 'completed') return actualPct >= 100;
-                    if (selectedStatus === 'delayed') return actualPct < planPct && (planPct - actualPct) > 5;
-                    if (selectedStatus === 'inprogress') return actualPct > 0 && actualPct < 100 && (planPct - actualPct) <= 5;
+                    if (selectedStatus === 'delayed') return actualPct < planPct && (planPct - actualPct) > 0.01;
+                    if (selectedStatus === 'inprogress') return (actualPct > 0 || planPct > 0) && actualPct < 100 && (planPct - actualPct) <= 0.01;
                     return true;
                 });
             }
@@ -350,93 +351,116 @@
             renderPlanTimeline(filteredData);
         }
 
-        // 📌 ฟังก์ชันแสดงผลแผนงาน 
+        // 📌 ฟังก์ชันวาด Timeline จัดกลุ่มตาม "หมวดงาน" -> "รายการ" -> "รายการย่อย"
         function renderPlanTimeline(dataToRender) {
             const container = document.getElementById('plan-timeline-container');
             
             if (dataToRender.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-300"><i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3 block"></i><p class="text-slate-500 font-medium">ไม่พบแผนงานที่ตรงกับเงื่อนไข</p></div>`;
+                container.innerHTML = `<div class="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-300"><i class="fa-solid fa-clipboard-list text-4xl text-slate-300 mb-3 block"></i><p class="text-slate-500 font-medium">ไม่พบแผนงานที่ตรงกับเงื่อนไข</p></div>`;
                 return;
             }
 
+            // จัดกลุ่ม 2 ชั้น
             const groupedPlans = {};
             dataToRender.forEach(row => {
-                const category = row['รายการ'] ? row['รายการ'].trim() : 'งานทั่วไป';
-                if (!groupedPlans[category]) groupedPlans[category] = [];
-                groupedPlans[category].push(row);
+                const mainCat = row['หมวดงาน'] ? row['หมวดงาน'].trim() : 'หมวดงานอื่นๆ';
+                const subCat = row['รายการ'] ? row['รายการ'].trim() : 'รายการอื่นๆ';
+                
+                if (!groupedPlans[mainCat]) groupedPlans[mainCat] = {};
+                if (!groupedPlans[mainCat][subCat]) groupedPlans[mainCat][subCat] = [];
+                
+                groupedPlans[mainCat][subCat].push(row);
             });
 
             let html = '';
             
-            for (const [category, plans] of Object.entries(groupedPlans)) {
+            for (const [mainCat, subCats] of Object.entries(groupedPlans)) {
                 html += `
-                <div class="mb-8">
-                    <h4 class="text-md font-bold text-slate-700 mb-4 flex items-center bg-slate-100 px-4 py-2 rounded-lg inline-block">
-                        <i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i> ${category}
-                    </h4>
-                    <div class="timeline-container">
+                <div class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-indigo-900 border-b-2 border-indigo-100 pb-3 mb-6 flex items-center">
+                        <i class="fa-solid fa-folder-tree mr-3 text-indigo-500 text-2xl"></i> ${mainCat}
+                    </h3>
                 `;
-
-                plans.forEach(plan => {
-                    const taskName = plan['รายการย่อย'];
-                    const startDate = plan['วันเริ่มต้น'] || '-';
-                    const endDate = plan['วันสิ้นสุด'] || '-';
-                    const duration = plan['ระยะเวลา (วัน)'] || '0';
-                    const planPct = parseProgressPercentage(plan['แผนความก้าวหน้า']);
-                    const actualPct = parseProgressPercentage(plan['ผลความก้าวหน้า']);
-                    
-                    let barColor = 'bg-blue-500';
-                    let statusIcon = '';
-                    
-                    if (actualPct >= 100) {
-                        barColor = 'bg-emerald-500';
-                        statusIcon = '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs ml-2">✅ เสร็จสิ้น</span>';
-                    } else if (actualPct < planPct && (planPct - actualPct) > 5) {
-                        barColor = 'bg-rose-500';
-                        statusIcon = '<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs ml-2 animate-pulse">⚠️ ล่าช้า</span>';
-                    } else if (actualPct > 0) {
-                        barColor = 'bg-indigo-500';
-                        statusIcon = '<span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs ml-2">⏳ ดำเนินการ</span>';
-                    }
-
+                
+                for (const [subCat, plans] of Object.entries(subCats)) {
                     html += `
-                        <div class="relative bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4 hover:shadow-md smooth-transition hover:border-indigo-300">
-                            <div class="timeline-dot"></div>
-                            
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-                                <h5 class="font-bold text-slate-800 text-base flex items-center">${taskName} ${statusIcon}</h5>
-                                <div class="flex items-center gap-3 text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 w-fit">
-                                    <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i> ${startDate} - ${endDate}</span>
-                                    <span class="text-slate-300">|</span>
-                                    <span><i class="fa-regular fa-clock text-slate-400 mr-1"></i> ${duration} วัน</span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-slate-500">แผนงานตั้งไว้</span>
-                                        <span class="font-bold text-slate-700">${planPct}%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 rounded-full h-2">
-                                        <div class="bg-slate-300 h-2 rounded-full" style="width: ${planPct}%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-slate-500">ผลงานทำได้จริง</span>
-                                        <span class="font-bold ${actualPct >= planPct ? 'text-emerald-600' : 'text-rose-600'}">${actualPct}%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 rounded-full h-2">
-                                        <div class="${barColor} h-2 rounded-full smooth-transition" style="width: ${actualPct}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mb-8 ml-2">
+                        <h4 class="text-base font-bold text-slate-700 mb-4 flex items-center bg-slate-100 border border-slate-200 px-4 py-2 rounded-lg inline-block shadow-sm">
+                            <i class="fa-solid fa-list-check text-indigo-400 mr-2"></i> ${subCat}
+                        </h4>
+                        <div class="timeline-container">
                     `;
-                });
+                    
+                    plans.forEach(plan => {
+                        const taskName = plan['รายการย่อย'];
+                        const startDate = plan['วันเริ่มต้น'] || '-';
+                        const endDate = plan['วันสิ้นสุด'] || '-';
+                        const duration = plan['ระยะเวลา (วัน)'] || '0';
+                        
+                        let planPct = parseProgressPercentage(plan['แผนความก้าวหน้า']);
+                        let actualPct = parseProgressPercentage(plan['ผลความก้าวหน้า']);
 
-                html += `</div></div>`;
+                        const formatPct = (num) => Number.isInteger(num) ? num : num.toFixed(2);
+                        
+                        let barColor = 'bg-slate-300';
+                        let statusIcon = '<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-xs ml-2 border border-slate-200 shadow-sm"><i class="fa-solid fa-pause mr-1"></i> ยังไม่เริ่ม</span>';
+                        let valColor = 'text-slate-600';
+                        
+                        if (actualPct >= 100) {
+                            barColor = 'bg-emerald-500';
+                            valColor = 'text-emerald-600';
+                            statusIcon = '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs ml-2 border border-emerald-200 shadow-sm"><i class="fa-solid fa-check mr-1"></i> เสร็จสมบูรณ์</span>';
+                        } else if (actualPct < planPct && (planPct - actualPct) > 0.01) {
+                            barColor = 'bg-rose-500';
+                            valColor = 'text-rose-600';
+                            statusIcon = '<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs ml-2 border border-rose-200 shadow-sm animate-pulse"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ล่าช้ากว่าแผน</span>';
+                        } else if (actualPct > 0 || planPct > 0) {
+                            barColor = 'bg-indigo-500';
+                            valColor = 'text-indigo-600';
+                            statusIcon = '<span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs ml-2 border border-indigo-200 shadow-sm"><i class="fa-solid fa-person-digging mr-1"></i> ดำเนินการตามแผน</span>';
+                        }
+
+                        html += `
+                            <div class="hover-card relative bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4 cursor-default">
+                                <div class="timeline-dot"></div>
+                                
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                                    <h5 class="font-bold text-slate-800 text-base flex items-center flex-wrap gap-y-2">
+                                        ${taskName} ${statusIcon}
+                                    </h5>
+                                    <div class="flex items-center gap-3 text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 w-fit shrink-0">
+                                        <span><i class="fa-regular fa-calendar text-slate-400 mr-1"></i> ${startDate} - ${endDate}</span>
+                                        <span class="text-slate-300">|</span>
+                                        <span><i class="fa-solid fa-stopwatch text-slate-400 mr-1"></i> ${duration} วัน</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1.5">
+                                            <span class="text-slate-500"><i class="fa-solid fa-bullseye text-slate-400 mr-1"></i> แผนงานตั้งไว้</span>
+                                            <span class="font-bold text-slate-700">${formatPct(planPct)}%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 rounded-full h-2.5 shadow-inner">
+                                            <div class="bg-slate-300 h-2.5 rounded-full" style="width: ${Math.min(planPct, 100)}%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1.5">
+                                            <span class="text-slate-500"><i class="fa-solid fa-chart-line text-indigo-400 mr-1"></i> ผลงานทำได้จริง</span>
+                                            <span class="font-bold ${valColor}">${formatPct(actualPct)}%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 rounded-full h-2.5 shadow-inner">
+                                            <div class="${barColor} h-2.5 rounded-full smooth-transition relative" style="width: ${Math.min(actualPct, 100)}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
             }
             container.innerHTML = html;
         }
@@ -653,12 +677,12 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // 📌 ดึงข้อมูลแผนงาน และสร้างตัวเลือก Dropdown
+                // 📌 โหลดข้อมูลแผนงาน
                 const planData = await fetchCSV(URLS.plan);
                 if (planData.length > 0) {
                     globalPlanData = planData.filter(row => row['รายการย่อย'] && row['รายการย่อย'].trim() !== '');
-                    populateCategoryDropdown(globalPlanData); // สร้างเมนูหมวดหมู่
-                    renderPlanTimeline(globalPlanData);       // วาดหน้าจอครั้งแรก
+                    populateCategoryDropdown(globalPlanData);
+                    renderPlanTimeline(globalPlanData);
                 }
 
                 const docsData = await fetchCSV(URLS.docs);
