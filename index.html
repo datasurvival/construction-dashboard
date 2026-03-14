@@ -128,7 +128,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
-                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-building text-indigo-500 mr-2"></i> ภาพรวมการก่อสร้าง</h3>
+                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center"><i class="fa-solid fa-building text-indigo-500 mr-2"></i> ภาพรวมการก่อสร้างทั้งหมด</h3>
                     <div class="w-full flex-1 min-h-[250px]"><canvas id="buildingStatusChart"></canvas></div>
                 </div>
                 
@@ -137,7 +137,7 @@
                     
                     <div class="mb-4">
                         <p class="text-sm text-slate-500">รวมงบประมาณที่ได้รับ (บาท)</p>
-                        <h4 class="text-3xl font-bold text-slate-800" id="yearly-total-display">1,968,368,000</h4>
+                        <h4 class="text-3xl font-bold text-slate-800" id="yearly-total-display">985,055,000</h4>
                     </div>
 
                     <div class="w-full flex-1 min-h-[220px]"><canvas id="yearlyBudgetChart"></canvas></div>
@@ -285,17 +285,12 @@
 
         async function loadData() {
             try {
-                // ตัวแปรสำหรับเก็บยอดรวมงบประมาณ เพื่อไปแสดงบนกราฟ
-                let grandTotalBudgetForChart = 0; 
-
                 const overviewData = await fetchCSV(URLS.overview);
                 if(overviewData.length >= 2) {
                     const valColumn = Object.keys(overviewData[0])[0]; 
                     const approved = safeParseFloat(overviewData[0][valColumn]);
                     const remBudget = safeParseFloat(overviewData[1][valColumn]);
                     const totalBudget = approved + remBudget;
-                    grandTotalBudgetForChart = totalBudget; // 📌 เก็บค่าไว้ใช้
-
                     const timeElapsed = safeParseFloat(overviewData[0]['เวลาคงเหลือ']);
                     const timeRem = safeParseFloat(overviewData[1]['เวลาคงเหลือ']);
                     const totalTime = timeElapsed + timeRem;
@@ -312,8 +307,8 @@
                     document.getElementById('pct-rem-time').innerText = (totalTime>0?((timeRem/totalTime)*100).toFixed(2):0) + '%';
                 }
 
-                // 📌 แสดงตัวเลขงบประมาณรวมเหนือชาร์ต (ถ้าดึงข้อมูลได้ ให้แสดง ถ้าไม่ได้ให้แสดง 0)
-                document.getElementById('yearly-total-display').innerText = grandTotalBudgetForChart.toLocaleString();
+                // 📌 เปลี่ยนการเซ็ตค่าแสดงผลมาเป็นตัวเลขที่เรากำหนดไว้ (985,055,000 บาท) แบบคงที่
+                document.getElementById('yearly-total-display').innerText = (985055000).toLocaleString();
 
                 const instData = await fetchCSV(URLS.installments);
                 if(instData.length > 0) {
@@ -426,9 +421,9 @@
                     new Chart(document.getElementById('jobBudgetBarChart').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [ { label: 'เบิกจ่ายแล้ว', data: chartCompMoney, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'รอเบิกจ่าย', data: chartRemMoney, backgroundColor: '#cbd5e1', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
                 }
 
-
+                // 📌 กราฟเส้นงบประมาณรายปี (คุณสามารถแก้ตัวเลขใน yearlyBudgetData ด้านล่างเพื่อให้กราฟแสดงข้อมูลจริงได้เลยครับ)
                 const yearlyLabels = ['ปี 2568', 'ปี 2569', 'ปี 2570', 'ปี 2571'];
-                const yearlyBudgetData = [197011000, 76672800, 328751700, 368019500]; 
+                const yearlyBudgetData = [197011000, 76672800, 328751700, 383019500]; 
 
                 new Chart(document.getElementById('yearlyBudgetChart').getContext('2d'), {
                     type: 'line',
@@ -437,15 +432,15 @@
                         datasets: [{
                             label: 'งบประมาณ (บาท)',
                             data: yearlyBudgetData,
-                            borderColor: '#10b981',      // สีเส้นกราฟ (เขียว)
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)', // สีพื้นหลังใต้เส้น
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             borderWidth: 3,
                             pointBackgroundColor: '#ffffff',
                             pointBorderColor: '#10b981',
                             pointBorderWidth: 2,
                             pointRadius: 5,
-                            fill: true,                  // แรงเงาใต้เส้น
-                            tension: 0.3                 // ทำให้เส้นมีความโค้งมน
+                            fill: true,
+                            tension: 0.3
                         }]
                     },
                     options: {
@@ -466,7 +461,6 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        // ย่อตัวเลขให้ดูง่ายขึ้น เช่น 400M
                                         return (value / 1000000) + 'M';
                                     }
                                 }
