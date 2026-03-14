@@ -17,7 +17,7 @@
         .smooth-transition { transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* สไตล์พิเศษสำหรับ Timeline แบบจัดกลุ่ม */
+        /* สไตล์พิเศษสำหรับ Timeline */
         .timeline-container { position: relative; border-left: 2px dashed #cbd5e1; margin-left: 1rem; padding-left: 1.5rem; }
         .timeline-dot { position: absolute; left: -0.45rem; top: 1.5rem; width: 0.85rem; height: 0.85rem; border-radius: 50%; background-color: #cbd5e1; border: 2px solid white; box-shadow: 0 0 0 2px #f1f5f9; transition: all 0.3s; }
         .hover-card:hover .timeline-dot { background-color: #6366f1; box-shadow: 0 0 0 3px #e0e7ff; scale: 1.2; }
@@ -238,15 +238,12 @@
     </main>
 
     <script>
-        // ⚠️ หมายเหตุ: ตรง URLS.plan ผมยังใช้ลิงก์เดิมที่คุณเคยให้นะครับ 
-        // หากไฟล์แผนงานใหม่ (ลิงก์ edit ที่คุณเพิ่งส่งมา) ยังไม่ได้แชร์เป็น "Publish to Web" 
-        // รบกวนไปกด Publish to web เป็น CSV แล้วนำลิงก์มาเปลี่ยนตรงบรรทัดนี้นะครับ
         const URLS = {
             overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=1259898676&single=true&output=csv',
             installments: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2028684559&single=true&output=csv',
             approvals: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=0&single=true&output=csv',
             docs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=655008589&single=true&output=csv',
-            plan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2017221579&single=true&output=csv' 
+            plan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSbv9_Em_dJ3JO3C2oKxd8yiY22Mf6nKL4tuWZgExtHPsj1Goibo9X3JSCKn0fH5zo8cX2tIp0_2mjG/pub?gid=2017221579&single=true&output=csv'
         };
 
         const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -306,7 +303,6 @@
             return num; 
         }
 
-        // 📌 สร้างตัวเลือก Dropdown จากคอลัมน์ "หมวดงาน"
         function populateCategoryDropdown(data) {
             const categories = new Set();
             data.forEach(row => {
@@ -325,7 +321,6 @@
             });
         }
 
-        // 📌 ฟังก์ชันกรองข้อมูลตามเงื่อนไข Dropdown
         function filterPlanDataDropdown() {
             const selectedCat = document.getElementById('filter-category').value;
             const selectedStatus = document.getElementById('filter-status').value;
@@ -338,8 +333,9 @@
 
             if (selectedStatus !== 'all') {
                 filteredData = filteredData.filter(plan => {
-                    const planPct = parseProgressPercentage(plan['แผนความก้าวหน้า']);
-                    const actualPct = parseProgressPercentage(plan['ผลความก้าวหน้า']);
+                    // 📌 แก้ไขชื่อคอลัมน์ให้ตรงกับชีทจริง
+                    const planPct = parseProgressPercentage(plan['แผนความก้าวหน้าสะสม (%)']);
+                    const actualPct = parseProgressPercentage(plan['ผลความก้าวหน้าสะสม (%)']);
                     
                     if (selectedStatus === 'completed') return actualPct >= 100;
                     if (selectedStatus === 'delayed') return actualPct < planPct && (planPct - actualPct) > 0.01;
@@ -351,7 +347,6 @@
             renderPlanTimeline(filteredData);
         }
 
-        // 📌 ฟังก์ชันวาด Timeline จัดกลุ่มตาม "หมวดงาน" -> "รายการ" -> "รายการย่อย"
         function renderPlanTimeline(dataToRender) {
             const container = document.getElementById('plan-timeline-container');
             
@@ -360,7 +355,6 @@
                 return;
             }
 
-            // จัดกลุ่ม 2 ชั้น
             const groupedPlans = {};
             dataToRender.forEach(row => {
                 const mainCat = row['หมวดงาน'] ? row['หมวดงาน'].trim() : 'หมวดงานอื่นๆ';
@@ -397,8 +391,9 @@
                         const endDate = plan['วันสิ้นสุด'] || '-';
                         const duration = plan['ระยะเวลา (วัน)'] || '0';
                         
-                        let planPct = parseProgressPercentage(plan['แผนความก้าวหน้า']);
-                        let actualPct = parseProgressPercentage(plan['ผลความก้าวหน้า']);
+                        // 📌 แก้ไขชื่อคอลัมน์ให้ตรงกับชีทจริง
+                        let planPct = parseProgressPercentage(plan['แผนความก้าวหน้าสะสม (%)']);
+                        let actualPct = parseProgressPercentage(plan['ผลความก้าวหน้าสะสม (%)']);
 
                         const formatPct = (num) => Number.isInteger(num) ? num : num.toFixed(2);
                         
@@ -438,7 +433,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <div class="flex justify-between text-xs mb-1.5">
-                                            <span class="text-slate-500"><i class="fa-solid fa-bullseye text-slate-400 mr-1"></i> แผนงานตั้งไว้</span>
+                                            <span class="text-slate-500"><i class="fa-solid fa-bullseye text-slate-400 mr-1"></i> แผนความก้าวหน้าสะสม</span>
                                             <span class="font-bold text-slate-700">${formatPct(planPct)}%</span>
                                         </div>
                                         <div class="w-full bg-slate-100 rounded-full h-2.5 shadow-inner">
@@ -447,7 +442,7 @@
                                     </div>
                                     <div>
                                         <div class="flex justify-between text-xs mb-1.5">
-                                            <span class="text-slate-500"><i class="fa-solid fa-chart-line text-indigo-400 mr-1"></i> ผลงานทำได้จริง</span>
+                                            <span class="text-slate-500"><i class="fa-solid fa-chart-line text-indigo-400 mr-1"></i> ผลความก้าวหน้าสะสม</span>
                                             <span class="font-bold ${valColor}">${formatPct(actualPct)}%</span>
                                         </div>
                                         <div class="w-full bg-slate-100 rounded-full h-2.5 shadow-inner">
@@ -680,6 +675,7 @@
                 // 📌 โหลดข้อมูลแผนงาน
                 const planData = await fetchCSV(URLS.plan);
                 if (planData.length > 0) {
+                    // กรองเอาเฉพาะบรรทัดที่มีรายการย่อย
                     globalPlanData = planData.filter(row => row['รายการย่อย'] && row['รายการย่อย'].trim() !== '');
                     populateCategoryDropdown(globalPlanData);
                     renderPlanTimeline(globalPlanData);
