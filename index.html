@@ -210,13 +210,12 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-500 mb-1">สถานะเวลา</label>
-                            <select id="filter-status" onchange="filterPlanData()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 bg-white shadow-sm cursor-pointer">
-                                <option value="all">🔍 แสดงทุกสถานะเวลา</option>
-                                <option value="inprogress">⏳ อยู่ในช่วงดำเนินการ</option>
-                                <option value="completed">🏁 ถึงกำหนดแล้วเสร็จ</option>
-                                <option value="notstarted">⏸️ ยังไม่ถึงกำหนดเริ่ม</option>
-                            </select>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">ตั้งแต่วันที่</label>
+                            <input type="date" id="plan-start-date" onchange="filterPlanData()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 bg-white shadow-sm cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">ถึงวันที่</label>
+                            <input type="date" id="plan-end-date" onchange="filterPlanData()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-indigo-500 bg-white shadow-sm cursor-pointer">
                         </div>
                         <div class="flex items-end">
                             <button onclick="resetPlanFilter()" class="h-[38px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 rounded-lg text-sm font-medium transition shadow-sm border border-slate-200" title="ล้างการค้นหา">
@@ -297,7 +296,6 @@
             return parseFloat(cleanString) || 0;
         }
 
-        // 📌 [ตัวการที่หายไป!] ฟังก์ชันแปลงเลขเปอร์เซ็นต์
         function parseProgressPercentage(val) {
             if (!val) return 0;
             let str = val.toString().trim();
@@ -308,7 +306,6 @@
             return num; 
         }
 
-        // 📌 แปลงวันที่ภาษาอังกฤษ
         function parseENDate(dateStr) {
             if (!dateStr || dateStr.trim() === '') return null;
             const d = new Date(dateStr);
@@ -320,7 +317,6 @@
             return dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        // 📌 ประมวลผลแผนงานแบบ WBS (Level 1, 2, 3)
         function processPlanData(data) {
             let processed = [];
             let currentL2 = 'หมวดงานทั่วไป';
@@ -379,23 +375,24 @@
 
         function filterPlanData() {
             const cat = document.getElementById('filter-category').value;
-            const status = document.getElementById('filter-status').value;
-            
+            const sd = document.getElementById('plan-start-date').value;
+            const ed = document.getElementById('plan-end-date').value;
+
             let filtered = globalPlanData;
 
             if (cat !== 'all') {
                 filtered = filtered.filter(item => item.l2 === cat);
             }
 
-            if (status !== 'all') {
-                const now = new Date();
+            if (sd || ed) {
+                const filterStart = sd ? new Date(sd) : new Date(2000, 0, 1);
+                const filterEnd = ed ? new Date(ed) : new Date(2100, 0, 1);
+                filterStart.setHours(0,0,0,0);
+                filterEnd.setHours(23,59,59,999);
+
                 filtered = filtered.filter(item => {
                     if (!item.startDate || !item.endDate) return false;
-                    
-                    if (status === 'completed') return now > item.endDate;
-                    if (status === 'inprogress') return now >= item.startDate && now <= item.endDate;
-                    if (status === 'notstarted') return now < item.startDate;
-                    return true;
+                    return item.startDate <= filterEnd && item.endDate >= filterStart;
                 });
             }
 
@@ -404,7 +401,8 @@
 
         function resetPlanFilter() {
             document.getElementById('filter-category').value = 'all';
-            document.getElementById('filter-status').value = 'all';
+            document.getElementById('plan-start-date').value = '';
+            document.getElementById('plan-end-date').value = '';
             filterPlanData();
         }
 
@@ -508,6 +506,7 @@
             container.innerHTML = html;
         }
 
+        // 📌 [จุดที่นำกลับมา!] พิกัดสำหรับวาดป้าย % ความคืบหน้าบนแผนผังรูปภาพ
         const MAP_COORDINATES = {
             "1": { top: '50%', left: '70%', name: 'ผังบริเวณ' },
             "2": { top: '80%', left: '30%', name: 'ส่วนประกอบอื่นๆ' },
@@ -556,17 +555,19 @@
                 if(instData.length > 0) {
                     const grouped = {};
                     let grandTotalInst = 0, grandCompInst = 0, grandCompMoney = 0;
+                    
+                    // ตัวแปรสำหรับเก็บ % ความคืบหน้าของแต่ละอาคาร
                     const buildingProgress = {};
 
                     instData.forEach(row => {
                         const jobName = row['ชื่องาน'] ? row['ชื่องาน'].trim() : '';
                         const groupName = row['ชื่องาน (group)'] ? row['ชื่องาน (group)'].trim() : '';
                         
+                        // อ่านค่า % จากคอลัมน์ "ความก้าวหน้า %" เพื่อเอาไปแสดงบนแผนผังรูปภาพ
                         if (groupName && row['ความก้าวหน้า %']) {
                             const match = groupName.match(/งาน\s*(\d+)/);
                             if (match) {
                                 const buildId = match[1];
-                                // ฟังก์ชัน parseProgressPercentage กลับมาทำงานได้ปกติแล้ว!
                                 const progPct = parseProgressPercentage(row['ความก้าวหน้า %']);
                                 if (!buildingProgress[buildId] || progPct > buildingProgress[buildId]) {
                                     buildingProgress[buildId] = progPct;
@@ -590,6 +591,36 @@
                             grandCompMoney += money;
                         }
                     });
+
+                    // 📌 [ส่วนที่นำกลับมา!] สร้างและวาดป้าย % ลงบนแผนผังรูปภาพ
+                    let mapHtml = '';
+                    for (const [id, coords] of Object.entries(MAP_COORDINATES)) {
+                        const prog = buildingProgress[id] !== undefined ? buildingProgress[id].toFixed(0) : 0;
+                        let bgColor = 'bg-slate-50 text-slate-500 border-slate-300 opacity-90';
+                        let indicatorHtml = '';
+                        
+                        if (prog >= 100) {
+                            bgColor = 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-200 shadow-lg';
+                        } else if (prog > 0) {
+                            bgColor = 'bg-amber-400 text-amber-900 border-amber-500 shadow-amber-200 shadow-lg';
+                            indicatorHtml = '<span class="absolute top-0 right-0 flex h-3 w-3 -mt-1 -mr-1"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span></span>';
+                        }
+
+                        mapHtml += `
+                        <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center hover:scale-110 transition-transform cursor-pointer group" 
+                             style="top: ${coords.top}; left: ${coords.left};">
+                            <div class="px-2 py-1 rounded-lg border text-xs md:text-sm font-bold relative ${bgColor} z-10 whitespace-nowrap">
+                                อาคาร ${id}: ${prog}%
+                                ${indicatorHtml}
+                            </div>
+                            <div class="w-3 h-3 bg-white border-2 border-slate-800 rounded-full mt-1 z-0 shadow-md"></div>
+                            <div class="hidden group-hover:block absolute top-full mt-2 w-max max-w-[200px] bg-slate-800 text-white text-xs p-2 rounded shadow-xl z-20">
+                                <span class="text-amber-300 font-bold">งาน ${id}:</span> ${coords.name} <br>
+                                คืบหน้าแล้ว ${prog}%
+                            </div>
+                        </div>`;
+                    }
+                    document.getElementById('map-badges').innerHTML = mapHtml;
 
                     let buildingCounts = { 'เสร็จสมบูรณ์': 0, 'กำลังก่อสร้าง': 0, 'ยังไม่เริ่ม': 0 };
                     for (let i = 1; i <= 15; i++) {
@@ -677,7 +708,7 @@
                     document.getElementById('approvals-body').innerHTML = html;
                 }
 
-                // 📌 โหลดข้อมูลแผนงาน (WBS)
+                // โหลดข้อมูลแผนงาน (WBS)
                 const planDataRaw = await fetchCSV(URLS.plan);
                 if (planDataRaw.length > 0) {
                     globalPlanData = processPlanData(planDataRaw);
